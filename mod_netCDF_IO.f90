@@ -2,7 +2,7 @@
 !                                                                              !
 !   PROGRAM : mod_netCDF_IO.f90                                                !
 !                                                                              !
-!   PURPOSE : Combine the PALM generated particle binary to each time file     !
+!   PURPOSE : Read and write the netCDF files                                  !
 !                                                                              !
 !                                                             2019.02.21.K.Noh !
 !                                                                              !
@@ -32,6 +32,12 @@
           SUBROUTINE netCDF_setup
 
               IMPLICIT NONE
+
+              dir_name   = "DATA/OISST_v2"
+              file_name  = "sst_daily_mean.1982-1984.v2.nc"
+              path_name  = "./"//TRIM(dir_name)//"/"//TRIM(file_name)
+
+              var_name   = "sst"
 
           END SUBROUTINE netCDF_setup
 
