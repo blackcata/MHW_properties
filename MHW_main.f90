@@ -52,23 +52,27 @@
             !                 Calculate the 11 day window mean                !
             !-----------------------------------------------------------------!
             CALL MHW_setup(N1,N2,N3)
-            CALL MHW_clim
+            CALL MHW_clim_percent(N1,N2)
             WRITE(*,*)  "--------CALCULATING PROCESS COMPLETED--------"
 
             !-----------------------------------------------------------------!
             !                        Write the SST data                       !
             !-----------------------------------------------------------------!
-            dir_name   =  "RESULT"
-            file_name  =  "OISST_v2_win_11_daily_clim_mean.1982-2014.nc"
-            var_name   =  "sst"
-            dim1_name  =  "lon" ; dim2_name = "lat" ; dim3_name = "time"
-            missing    =  -9.96921e+36
-            
             ALLOCATE(time(1:365))
             DO it = 1,365 ; time(it) = it ; END DO 
             N3 = 365
 
+            dir_name   =  "RESULT"
+            dim1_name  =  "lon" ; dim2_name = "lat" ; dim3_name = "time"
+            missing    =  -9.96921e+36
+            
+            file_name  =  "OISST_v2_win_11_daily_clim_mean.1982-1984.nc"
+            var_name   =  "sst_clim"
             CALL netCDF_write_3d(sst_clim,lon,lat,time)
+
+            file_name  =  "OISST_v2_win_11_daily_percent.1982-1984.nc"
+            var_name   =  "sst_percentile"
+            CALL netCDF_write_3d(sst_percentile,lon,lat,time)
 
             WRITE(*,*)  "--------WRITING PROCESS COMPLETED--------"
 

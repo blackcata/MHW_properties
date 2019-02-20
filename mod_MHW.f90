@@ -52,22 +52,25 @@
 
 !------------------------------------------------------------------------------!
 !                                                                              !
-!   SUBROUTINE : MHW_clim                                                      !
+!   SUBROUTINE : MHW_clim_percent                                              !
 !                                                                              !
 !   PURPOSE : Calculate the specific range window climatologic mean            !
 !                                                                              !
 !                                                             2019.02.21.K.Noh !
 !                                                                              !
 !------------------------------------------------------------------------------!
-          SUBROUTINE MHW_clim
+          SUBROUTINE MHW_clim_percent(Nx,Ny)
 
               IMPLICIT NONE            
 
-              INTEGER  ::  it, yr, tmp_ind, time_ind
+              INTEGER  ::  i, j, it, yr, tmp_ind, time_ind
+              INTEGER,INTENT(IN)  :: Nx, Ny
+              REAL(KIND=8)  :: ts_tmp( 1:(2*window+1)*(Nt_yr-2) )
 
               DO it = 1,365
                   sst_tmp(:,:,:)  =  0.0 
-                  
+                  ts_tmp(:)       =  0.0
+
                   DO  yr = 1, Nt_yr-2
                       tmp_ind   =  (2*window+1) * (yr-1) + 1
                       time_ind  =  yr*365 + it  
@@ -78,9 +81,18 @@
                   
                   sst_clim(:,:,it)  =  SUM(sst_tmp,DIM=3) /                     &
                                                         ((2*window+1)*(Nt_yr-2))
+                  DO i = 1,Nx
+                      DO j = 1,Ny
+
+                          ts_tmp  =  sst_tmp(i,j,:) 
+                          CALL QsortC(ts_tmp)
+                          sst_percentile(i,j,it)  = ts_tmp(N_percent) 
+
+                      END DO
+                  END DO 
 
               END DO 
 
-          END SUBROUTINE MHW_clim
+          END SUBROUTINE MHW_clim_percent
 
         END MODULE mod_MHWs
