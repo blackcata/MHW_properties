@@ -13,7 +13,6 @@
 
             IMPLICIT NONE
 
-            REAL(KIND=8),ALLOCATABLE,DIMENSION(:,:,:)  ::  data_var_3d
             CHARACTER(LEN=128)  ::  path_name, file_name, dir_name, var_name
 
             SAVE
@@ -34,10 +33,6 @@
               IMPLICIT NONE
 
               dir_name   = "DATA/OISST_v2"
-              file_name  = "sst_daily_mean.1982-1984.v2.nc"
-              path_name  = "./"//TRIM(dir_name)//"/"//TRIM(file_name)
-
-              var_name   = "sst"
 
           END SUBROUTINE netCDF_setup
 
@@ -50,11 +45,16 @@
 !                                                             2019.02.21.K.Noh !
 !                                                                              !
 !------------------------------------------------------------------------------!
-          SUBROUTINE netCDF_read
+          SUBROUTINE netCDF_read_3d(data_input,N1,N2,N3)
 
-              IMPLICIT NONE
+              IMPLICIT NONE            
+             
+              INTEGER,INTENT(IN)  ::  N1,N2,N3
+              REAL(KIND=8),INTENT(INOUT)  ::  data_input
 
-          END SUBROUTINE netCDF_read
+              path_name  = "./"//TRIM(dir_name)//"/"//TRIM(file_name)
+
+          END SUBROUTINE netCDF_read_3d
 
 !------------------------------------------------------------------------------!
 !                                                                              !
@@ -68,12 +68,13 @@
           SUBROUTINE CHECK(status)
 
               IMPLICIT NONE
-                  INTEGER,INTENT(IN)  ::  status
-                  
-                  IF (status /= NF90_NOERR) THEN
-                      WRITE(*,*) TRIM(NF90_STRERROR(status))
-                      STOP "STOPPED"
-                  END IF
+
+              INTEGER,INTENT(IN)  ::  status
+              
+              IF (status /= NF90_NOERR) THEN
+                  WRITE(*,*) TRIM(NF90_STRERROR(status))
+                  STOP "STOPPED"
+              END IF
 
           END SUBROUTINE CHECK
 
