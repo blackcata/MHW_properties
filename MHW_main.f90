@@ -18,6 +18,10 @@
             !-----------------------------------------------------------------!
             !                     Read the file's dimension                   !
             !-----------------------------------------------------------------!
+            N1 = 1440 ; N2 = 720 ; N3 = 1095 
+            dir_name   =  "DATA/OISST_v2"
+            file_name  =  "sst_daily_mean.1982-1984.v2.nc"
+
             !<Read the time dimension
             N  =  N3 
             var_name   =  "time"
@@ -39,13 +43,21 @@
             !-----------------------------------------------------------------!
             !                         Read the SST data                       !
             !-----------------------------------------------------------------!
-            N1 = 1440 ; N2 = 720 ; N3 = 1095 
-            dir_name   =  "DATA/OISST_v2"
-            file_name  =  "sst_daily_mean.1982-1984.v2.nc"
             var_name   =  "sst"
 
             ALLOCATE( sst_data(1:N1, 1:N2, 1:N3) ) 
-
+            !<Read the SST data
             CALL netCDF_read_3d(sst_data)
-           
+
+            !-----------------------------------------------------------------!
+            !                        Write the SST data                       !
+            !-----------------------------------------------------------------!
+            dir_name   =  "RESULT"
+            file_name  =  "sst_daily_mean.1982-1984.v2.nc"
+            var_name   =  "sst"
+            dim1_name  =  "lon" ; dim2_name = "lat" ; dim3_name = "time"
+            missing    =  -9.96921e+36
+            
+            CALL netCDF_write_3d(sst_data,lon,lat,time)
+
         END PROGRAM MHWs_main
