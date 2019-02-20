@@ -9,7 +9,6 @@
 !------------------------------------------------------------------------------!
         MODULE mod_MHWs
 
-            USE mod_netCDF_IO
             USE netcdf
 
             IMPLICIT NONE
