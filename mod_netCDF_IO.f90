@@ -51,7 +51,7 @@
 
               IMPLICIT NONE            
              
-              REAL(KIND=8),INTENT(INOUT)  ::  data_input
+              REAL(KIND=8),INTENT(INOUT)  ::  data_input(1:N1,1:N2,1:N3)
 
               path_name  = "./"//TRIM(dir_name)//"/"//TRIM(file_name)
 
