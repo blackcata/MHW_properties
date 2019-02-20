@@ -13,6 +13,7 @@
 
             IMPLICIT NONE
 
+            REAL(KIND=8),ALLOCATABLE,DIMENSION(:)      ::  lat, lon, time  
             REAL(KIND=8),ALLOCATABLE,DIMENSION(:,:,:)  ::  sst_data
 
             SAVE

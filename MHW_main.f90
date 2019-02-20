@@ -16,7 +16,28 @@
             IMPLICIT NONE
 
             !-----------------------------------------------------------------!
-            !                     netCDF reading file setup                   !
+            !                     Read the file's dimension                   !
+            !-----------------------------------------------------------------!
+            !<Read the time dimension
+            N  =  N3 
+            var_name   =  "time"
+            ALLOCATE(  time(1:N) ) 
+            CALL netCDF_read_1d( time ) 
+            
+            !<Read the latitude dimension
+            N  =  N2 
+            var_name   =  "lat"
+            ALLOCATE(  lat(1:N) ) 
+            CALL netCDF_read_1d( lat ) 
+
+            !<Read the longitude dimension
+            N  =  N1 
+            var_name   =  "lon"
+            ALLOCATE(  lon(1:N) ) 
+            CALL netCDF_read_1d( lon ) 
+
+            !-----------------------------------------------------------------!
+            !                         Read the SST data                       !
             !-----------------------------------------------------------------!
             N1 = 1440 ; N2 = 720 ; N3 = 1095 
             dir_name   =  "DATA/OISST_v2"
@@ -26,5 +47,5 @@
             ALLOCATE( sst_data(1:N1, 1:N2, 1:N3) ) 
 
             CALL netCDF_read_3d(sst_data)
-
+           
         END PROGRAM MHWs_main
