@@ -3,7 +3,7 @@ FCFLAGS=-O3 -I${NETCDF}/include
 LDFLAGS=-L${NETCDF}/lib -lnetcdff -lnetcdf
 
 TARGET= EXE_MHWs
-OBJECT= MHW_main.o
+OBJECT= MHW_main.o mod_netCDF_IO.o
 
 all : $(TARGET)
 $(TARGET) : $(OBJECT)
@@ -16,4 +16,5 @@ $(TARGET) : $(OBJECT)
 
 clean :
 	rm -f *.o
+	rm -f *.mod
 	rm EXE_MHWs
