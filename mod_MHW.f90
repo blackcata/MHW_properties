@@ -10,6 +10,7 @@
         MODULE mod_MHWs
 
             USE netcdf
+            USE qsort_c_module
 
             IMPLICIT NONE
 

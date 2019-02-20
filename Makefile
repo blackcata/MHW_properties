@@ -3,7 +3,7 @@ FCFLAGS=-O3 -I${NETCDF}/include
 LDFLAGS=-L${NETCDF}/lib -lnetcdff -lnetcdf
 
 TARGET= EXE_MHWs
-OBJECT= mod_netCDF_IO.o mod_MHW.o MHW_main.o 
+OBJECT= mod_qsort.o mod_netCDF_IO.o mod_MHW.o MHW_main.o 
 
 all : $(TARGET)
 $(TARGET) : $(OBJECT)
