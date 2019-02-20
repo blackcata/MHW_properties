@@ -11,7 +11,9 @@
 
             USE netcdf
             USE mod_netCDF_IO
+            USE mod_MHWs
 
             IMPLICIT NONE
+
 
         END PROGRAM MHWs_main

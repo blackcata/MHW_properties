@@ -13,6 +13,7 @@
 
             IMPLICIT NONE
 
+            INTEGER  ::  N1, N2, N3
             INTEGER  ::  varid, ncid
             CHARACTER(LEN=128)  ::  path_name, file_name, dir_name, var_name
 
@@ -46,11 +47,10 @@
 !                                                             2019.02.21.K.Noh !
 !                                                                              !
 !------------------------------------------------------------------------------!
-          SUBROUTINE netCDF_read_3d(data_input,N1,N2,N3)
+          SUBROUTINE netCDF_read_3d(data_input)
 
               IMPLICIT NONE            
              
-              INTEGER,INTENT(IN)  ::  N1,N2,N3
               REAL(KIND=8),INTENT(INOUT)  ::  data_input
 
               path_name  = "./"//TRIM(dir_name)//"/"//TRIM(file_name)
