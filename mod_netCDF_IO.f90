@@ -43,6 +43,21 @@
 
 !------------------------------------------------------------------------------!
 !                                                                              !
+!   SUBROUTINE : netCDF_read                                                   !
+!                                                                              !
+!   PURPOSE : Reading the netCDF files                                         !
+!                                                                              !
+!                                                             2019.02.21.K.Noh !
+!                                                                              !
+!------------------------------------------------------------------------------!
+          SUBROUTINE netCDF_read
+
+              IMPLICIT NONE
+
+          END SUBROUTINE netCDF_read
+
+!------------------------------------------------------------------------------!
+!                                                                              !
 !   SUBROUTINE : CHECK                                                         !
 !                                                                              !
 !   PURPOSE : Checking up the netcdf module's function & subroutine            !
