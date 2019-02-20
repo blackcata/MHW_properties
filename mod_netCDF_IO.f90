@@ -13,9 +13,6 @@ MODULE mod_netCDF_IO
 
     IMPLICIT NONE
 
-    INTEGER  :: total_particle_number, class_num 
-    REAL(KIND=8)  ::  target_time, eps_t, target_z, eps_z, target_x, eps_x
-
     SAVE
 
   CONTAINS
