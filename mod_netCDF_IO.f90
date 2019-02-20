@@ -41,4 +41,25 @@
 
           END SUBROUTINE netCDF_setup
 
+!------------------------------------------------------------------------------!
+!                                                                              !
+!   SUBROUTINE : CHECK                                                         !
+!                                                                              !
+!   PURPOSE : Checking up the netcdf module's function & subroutine            !
+!                                                                              !
+!                                                             2019.02.21.K.Noh !
+!                                                                              !
+!------------------------------------------------------------------------------!
+          SUBROUTINE CHECK(status)
+
+              IMPLICIT NONE
+                  INTEGER,INTENT(IN)  ::  status
+                  
+                  IF (status /= NF90_NOERR) THEN
+                      WRITE(*,*) TRIM(NF90_STRERROR(status))
+                      STOP "STOPPED"
+                  END IF
+
+          END SUBROUTINE CHECK
+
         END MODULE mod_netCDF_IO
