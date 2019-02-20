@@ -10,6 +10,7 @@
         PROGRAM MHWs_main
 
             USE netcdf
+            USE mod_netCDF_IO
 
             IMPLICIT NONE
 
