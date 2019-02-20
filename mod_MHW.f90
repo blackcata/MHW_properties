@@ -62,6 +62,24 @@
 
               IMPLICIT NONE            
 
+              INTEGER  ::  it, yr, tmp_ind, time_ind
+
+              DO it = 1,365
+                  sst_tmp(:,:,:)  =  0.0 
+                  
+                  DO  yr = 1, Nt_yr-2
+                      tmp_ind   =  (2*window+1) * (yr-1) + 1
+                      time_ind  =  yr*365 + it  
+
+                      sst_tmp(:,:,tmp_ind:tmp_ind+2*window)  =                  &
+                                  sst_data(:,:,time_ind-window:time_ind+window)
+                  END DO 
+                  
+                  sst_clim(:,:,it)  =  SUM(sst_tmp,DIM=3) /                     &
+                                                        ((2*window+1)*(Nt_yr-2))
+
+              END DO 
+
           END SUBROUTINE MHW_clim
 
         END MODULE mod_MHWs

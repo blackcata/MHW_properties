@@ -14,6 +14,7 @@
             USE mod_MHWs
 
             IMPLICIT NONE
+            INTEGER :: it
 
             !-----------------------------------------------------------------!
             !                     Read the file's dimension                   !
@@ -22,12 +23,6 @@
             dir_name   =  "DATA/OISST_v2"
             file_name  =  "sst_daily_mean.1982-1984.v2.nc"
 
-            !<Read the time dimension
-            N  =  N3 
-            var_name   =  "time"
-            ALLOCATE(  time(1:N) ) 
-            CALL netCDF_read_1d( time ) 
-            
             !<Read the latitude dimension
             N  =  N2 
             var_name   =  "lat"
@@ -48,11 +43,12 @@
             ALLOCATE( sst_data(1:N1, 1:N2, 1:N3) ) 
             !<Read the SST data
             CALL netCDF_read_3d(sst_data)
-
+            
             !-----------------------------------------------------------------!
             !                 Calculate the 11 day window mean                !
             !-----------------------------------------------------------------!
             CALL MHW_setup(N1,N2,N3)
+            CALL MHW_clim
 
             !-----------------------------------------------------------------!
             !                        Write the SST data                       !
@@ -63,6 +59,10 @@
             dim1_name  =  "lon" ; dim2_name = "lat" ; dim3_name = "time"
             missing    =  -9.96921e+36
             
-            CALL netCDF_write_3d(sst_data,lon,lat,time)
+            ALLOCATE(time(1:365))
+            DO it = 1,365 ; time(it) = it ; END DO 
+            N3 = 365
+
+            CALL netCDF_write_3d(sst_clim,lon,lat,time)
 
         END PROGRAM MHWs_main
