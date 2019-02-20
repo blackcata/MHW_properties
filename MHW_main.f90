@@ -20,9 +20,9 @@
             !-----------------------------------------------------------------!
             !                     Read the file's dimension                   !
             !-----------------------------------------------------------------!
-            N1 = 1440 ; N2 = 720 ; N3 = 1095 
+            N1 = 1440 ; N2 = 720 ; N3 = 13477
             dir_name   =  "DATA/OISST_v2"
-            file_name  =  "sst_daily_mean.1982-1984.v2.nc"
+            file_name  =  "sst_daily_mean.1982-2018.v2.nc"
             WRITE(*,*)  "------------BASIC SETUP COMPLETED------------"
             
             !<Read the latitude dimension
@@ -66,11 +66,13 @@
             dim1_name  =  "lon" ; dim2_name = "lat" ; dim3_name = "time"
             missing    =  -9.96921e+36
             
-            file_name  =  "OISST_v2_win_11_daily_clim_mean.1982-1984.nc"
+            !<Write the climatological mean 
+            file_name  =  "OISST_v2_win_11_daily_clim_mean.1982-2018.nc"
             var_name   =  "sst_clim"
             CALL netCDF_write_3d(sst_clim,lon,lat,time)
 
-            file_name  =  "OISST_v2_win_11_daily_percent.1982-1984.nc"
+            !<Write the specific percentile data
+            file_name  =  "OISST_v2_win_11_daily_percent.1982-2018.nc"
             var_name   =  "sst_percentile"
             CALL netCDF_write_3d(sst_percentile,lon,lat,time)
 

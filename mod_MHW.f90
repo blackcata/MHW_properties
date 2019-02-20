@@ -68,9 +68,11 @@
               REAL(KIND=8)  :: ts_tmp( 1:(2*window+1)*(Nt_yr-2) )
 
               DO it = 1,365
+              WRITE(*,*) it,"DAY IS PROCESSING"
                   sst_tmp(:,:,:)  =  0.0 
                   ts_tmp(:)       =  0.0
 
+                  !<Gather the time series of each day to sst_tmp
                   DO  yr = 1, Nt_yr-2
                       tmp_ind   =  (2*window+1) * (yr-1) + 1
                       time_ind  =  yr*365 + it  
@@ -78,16 +80,17 @@
                       sst_tmp(:,:,tmp_ind:tmp_ind+2*window)  =                  &
                                   sst_data(:,:,time_ind-window:time_ind+window)
                   END DO 
-                  
+                 
+                  !<Caculate the climatological mean with specific windows
                   sst_clim(:,:,it)  =  SUM(sst_tmp,DIM=3) /                     &
                                                         ((2*window+1)*(Nt_yr-2))
+
+                  !<Calculate the specific percentile of each day's time series 
                   DO i = 1,Nx
                       DO j = 1,Ny
-
                           ts_tmp  =  sst_tmp(i,j,:) 
                           CALL QsortC(ts_tmp)
                           sst_percentile(i,j,it)  = ts_tmp(N_percent) 
-
                       END DO
                   END DO 
 
