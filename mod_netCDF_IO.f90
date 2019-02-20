@@ -13,6 +13,7 @@
 
             IMPLICIT NONE
 
+            INTEGER  ::  varid, ncid
             CHARACTER(LEN=128)  ::  path_name, file_name, dir_name, var_name
 
             SAVE
@@ -53,6 +54,18 @@
               REAL(KIND=8),INTENT(INOUT)  ::  data_input
 
               path_name  = "./"//TRIM(dir_name)//"/"//TRIM(file_name)
+
+              !< Open the file, NF90_NOWRITE : read-only access to files
+              CALL CHECK( NF90_OPEN(path_name, NF90_NOWRITE, ncid) )
+
+              !< Get the varid of the data variable, based on its name
+              CALL CHECK( NF90_INQ_VARID(ncid, TRIM(var_name), varid) )
+
+              !< Read the data
+              CALL CHECK( NF90_GET_VAR(ncid, varid, data_input) )
+
+              !< Close the file
+              CALL CHECK( NF90_CLOSE(ncid) )
 
           END SUBROUTINE netCDF_read_3d
 
