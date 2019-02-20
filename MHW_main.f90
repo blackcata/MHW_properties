@@ -50,10 +50,15 @@
             CALL netCDF_read_3d(sst_data)
 
             !-----------------------------------------------------------------!
+            !                 Calculate the 11 day window mean                !
+            !-----------------------------------------------------------------!
+            CALL MHW_setup(N1,N2)
+
+            !-----------------------------------------------------------------!
             !                        Write the SST data                       !
             !-----------------------------------------------------------------!
             dir_name   =  "RESULT"
-            file_name  =  "sst_daily_mean.1982-1984.v2.nc"
+            file_name  =  "OISST_v2_win_11_daily_clim_mean.1982-2014.nc"
             var_name   =  "sst"
             dim1_name  =  "lon" ; dim2_name = "lat" ; dim3_name = "time"
             missing    =  -9.96921e+36
