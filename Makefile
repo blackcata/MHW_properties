@@ -1,6 +1,6 @@
 F90=ifort
-FCFLAGS=-O3 -I${NETCDF}/include
-LDFLAGS=-L${NETCDF}/lib -lnetcdff -lnetcdf
+FCFLAGS=-O3 -I${NETCDF}/include -qopenmp
+LDFLAGS=-L${NETCDF}/lib -lnetcdff -lnetcdf -parallel
 
 TARGET= EXE_MHWs
 OBJECT= mod_qsort.o mod_netCDF_IO.o mod_MHW.o MHW_main.o 
