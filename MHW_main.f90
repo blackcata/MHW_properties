@@ -20,11 +20,17 @@
             !-----------------------------------------------------------------!
             !                     Read the file's dimension                   !
             !-----------------------------------------------------------------!
-            N1 = 1440 ; N2 = 720 ; N3 = 13477
+            N1 = 1440 ; N2 = 720 ; N3 = 1095
             dir_name   =  "DATA/OISST_v2"
-            file_name  =  "sst_daily_mean.1982-2018.v2.nc"
+            file_name  =  "sst_daily_mean.1982-1984.v2.nc"
             WRITE(*,*)  "------------BASIC SETUP COMPLETED------------"
             
+            !<Read the time dimension
+            N  =  N3
+            var_name   =  "lon"
+            ALLOCATE(  time(1:N) ) 
+            CALL netCDF_read_1d( time ) 
+
             !<Read the latitude dimension
             N  =  N2 
             var_name   =  "lat"
@@ -53,26 +59,34 @@
             !-----------------------------------------------------------------!
             CALL MHW_setup(N1,N2,N3)
             CALL MHW_clim_percent(N1,N2)
+            CALL MHW_intensity
+
             WRITE(*,*)  "--------CALCULATING PROCESS COMPLETED--------"
 
             !-----------------------------------------------------------------!
             !                        Write the SST data                       !
             !-----------------------------------------------------------------!
-            ALLOCATE(time(1:365))
-            DO it = 1,365 ; time(it) = it ; END DO 
-            N3 = 365
-
+            !<Basic settings for the each variables & directory 
             dir_name   =  "RESULT"
             dim1_name  =  "lon" ; dim2_name = "lat" ; dim3_name = "time"
             missing    =  -9.96921e+36
+
+            !<Write the intensity contour of MHWas
+            file_name  =  "OISST_v2_win_11_daily_intensity.1982-1984.nc"
+            var_name   =  "sst_anom"
+            CALL netCDF_write_3d(sst_anom,lon,lat,time)
             
+            DEALLOCATE(time)  ;  ALLOCATE(time(1:365))
+            DO it = 1,365 ; time(it) = it ; END DO 
+            N3 = 365
+
             !<Write the climatological mean 
-            file_name  =  "OISST_v2_win_11_daily_clim_mean.1982-2018.nc"
+            file_name  =  "OISST_v2_win_11_daily_clim_mean.1982-1984.nc"
             var_name   =  "sst_clim"
             CALL netCDF_write_3d(sst_clim,lon,lat,time)
 
             !<Write the specific percentile data
-            file_name  =  "OISST_v2_win_11_daily_percent.1982-2018.nc"
+            file_name  =  "OISST_v2_win_11_daily_percent.1982-1984.nc"
             var_name   =  "sst_percentile"
             CALL netCDF_write_3d(sst_percentile,lon,lat,time)
 

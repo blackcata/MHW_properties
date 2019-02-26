@@ -20,6 +20,7 @@
             REAL(KIND=8),ALLOCATABLE,DIMENSION(:)      ::  lat, lon, time  
             REAL(KIND=8),ALLOCATABLE,DIMENSION(:,:,:)  ::  sst_data
             REAL(KIND=8),ALLOCATABLE,DIMENSION(:,:,:)  ::  sst_clim, sst_percentile
+            REAL(KIND=8),ALLOCATABLE,DIMENSION(:,:,:)  ::  sst_anom
 
             SAVE
 
@@ -46,6 +47,7 @@
 
               ALLOCATE( sst_clim(1:Nx,1:Ny,1:365) ) 
               ALLOCATE( sst_percentile(1:Nx,1:Ny,1:365) )
+              ALLOCATE( sst_anom(1:Nx,1:Ny,1:Nt) ) 
               
           END SUBROUTINE MHW_setup
 
@@ -101,5 +103,29 @@
               END DO 
 
           END SUBROUTINE MHW_clim_percent
+
+!------------------------------------------------------------------------------!
+!                                                                              !
+!   SUBROUTINE : MHW_intensity                                                 !
+!                                                                              !
+!   PURPOSE : Calculate the MHWs' intensity                                    !
+!                                                                              !
+!                                                             2019.02.26.K.Noh !
+!                                                                              !
+!------------------------------------------------------------------------------!
+          SUBROUTINE MHW_intensity
+
+              IMPLICIT NONE            
+              INTEGER  ::  yr, ind_str
+
+              !$OMP PARALLEL DO private(yr,ind_str)
+              DO yr = 1,Nt_yr 
+                 ind_str  =  (yr-1)*365 + 1
+                 sst_anom(:,:,ind_str:ind_str+365-1)  =                         &
+                 sst_data(:,:,ind_str:ind_str+365-1)  -  sst_clim
+              END DO 
+              !OMP END PARALLEL
+
+          END SUBROUTINE MHW_intensity
 
         END MODULE mod_MHWs
