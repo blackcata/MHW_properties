@@ -125,6 +125,7 @@
 
               !$OMP PARALLEL DO private(yr,ind_str)
               DO yr = 1,Nt_yr 
+              WRITE(*,*) yr,"YEAR IS PROCESSING"
                  ind_str  =  (yr-1)*365 + 1
                  sst_anom(:,:,ind_str:ind_str+365-1)  =                         &
                  sst_data(:,:,ind_str:ind_str+365-1)  -  sst_percentile
@@ -159,13 +160,13 @@
 
               !$OMP PARALLEL DO private(i,j,yr,it,ind_str,ind_end,tmp,diff,diff_pre)
               DO j = 1,Ny
+                WRITE(*,*) j,"th LATITUDE IS PROCESSING"
                 DO i = 1,Nx
 
                     IF ( abs( sst_data(i,j,1) - missing ) < 1.0e+1 ) THEN 
                         MHWs_dur(i,j,:)  =  missing
                         CONTINUE
                     END IF
-
 
                     ind_str = 0  ;  ind_end = 0 
                     DO yr = 1,Nt_yr
