@@ -61,7 +61,7 @@
             !-----------------------------------------------------------------!
             CALL MHW_setup(N1,N2,N3)
             CALL MHW_clim_percent(N1,N2)
-            CALL MHW_intensity
+            CALL MHW_intensity(N1,N2)
             CALL MHW_duration(N1,N2)
 
             WRITE(*,*)  "--------CALCULATING PROCESS COMPLETED--------"

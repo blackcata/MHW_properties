@@ -117,18 +117,27 @@
 !                                                             2019.02.26.K.Noh !
 !                                                                              !
 !------------------------------------------------------------------------------!
-          SUBROUTINE MHW_intensity
+          SUBROUTINE MHW_intensity(Nx,Ny)
 
               IMPLICIT NONE            
-              INTEGER  ::  yr, ind_str
+              INTEGER,INTENT(IN)  ::  Nx, Ny
+              INTEGER  :: i, j, yr, ind_str
 
               !$OMP PARALLEL DO private(yr,ind_str)
               DO yr = 1,Nt_yr 
                  ind_str  =  (yr-1)*365 + 1
                  sst_anom(:,:,ind_str:ind_str+365-1)  =                         &
-                 sst_data(:,:,ind_str:ind_str+365-1)  -  sst_clim
+                 sst_data(:,:,ind_str:ind_str+365-1)  -  sst_percentile
               END DO 
               !OMP END PARALLEL
+
+              DO j = 1,Ny
+                DO i = 1,Nx
+                    IF ( abs( sst_data(i,j,1) - missing ) < 1.0e+1 ) THEN 
+                        sst_anom(i,j,:)  =  missing
+                    END IF
+                END DO 
+              END DO 
 
           END SUBROUTINE MHW_intensity
 
@@ -148,14 +157,23 @@
               INTEGER  :: i, j, it,  yr, tmp, ind_str, ind_end
               REAL(KIND=8) :: diff, diff_pre
 
-              DO yr = 1,Nt_yr 
-                WRITE(*,*) yr,"YEAR IS PROCESSING"
-                DO it = 1,365
-                  
-                    tmp  =  (yr-1) * 365
-                    DO j = 1,Ny
-                      DO i = 1,Nx
+              !$OMP PARALLEL DO private(i,j,yr,it,ind_str,ind_end,tmp,diff,diff_pre)
+              DO j = 1,Ny
+                DO i = 1,Nx
+
+                    IF ( abs( sst_data(i,j,1) - missing ) < 1.0e+1 ) THEN 
+                        MHWs_dur(i,j,:)  =  missing
+                        CONTINUE
+                    END IF
+
+
+                    ind_str = 0  ;  ind_end = 0 
+                    DO yr = 1,Nt_yr
+                      DO it = 1,365
+                          tmp  =  (yr-1) * 365 
+
                           diff  = sst_data(i,j,tmp+it) - sst_percentile(i,j,it)
+
                           IF (tmp + it > 1) THEN
                               diff_pre  = sst_data(i,j,tmp+it-1)                &
                                                   - sst_percentile(i,j,it-1)
@@ -163,29 +181,22 @@
                               diff_pre = 0.0
                           END IF
 
-                          IF( diff > 0 .AND. diff_pre < 0 )  ind_str = tmp + it
-                          IF( diff < 0 .AND. diff_pre > 0 )  THEN
+                          IF( diff >= 0 .AND. diff_pre <= 0 )  ind_str = tmp + it
+                          IF( diff <= 0 .AND. diff_pre >= 0 )  THEN
                               ind_end = tmp + it 
-                              !MHWs_dur(i,j,ind_str:ind_end) = 1.0
                               
                               IF (ind_end - ind_str >= 5) THEN 
                                   MHWs_dur(i,j,ind_str:ind_end) = 1.0
                               END IF
                           END IF 
 
-                      END DO 
+
+                      END DO
                     END DO 
 
                 END DO 
               END DO 
-              
-              DO j = 1,Ny
-                DO i = 1,Nx
-                    IF ( abs( sst_data(i,j,1) - missing ) < 1.0e+1 ) THEN 
-                        MHWs_dur(i,j,:)  =  missing
-                    END IF
-                END DO 
-              END DO 
+              !OMP END PARALLEL
 
           END SUBROUTINE MHW_duration
 
