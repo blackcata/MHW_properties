@@ -18,6 +18,7 @@
             REAL(KIND=8)  ::  missing
             CHARACTER(LEN=128)  ::  path_name, file_name, dir_name, var_name
             CHARACTER(LEN=128)  ::  dim1_name, dim2_name, dim3_name
+            CHARACTER(LEN=128)  ::  dim1_unit, dim2_unit, dim3_unit
 
             SAVE
 
@@ -128,7 +129,8 @@
               !<Define dimensions
               CALL CHECK( NF90_DEF_DIM(ncid, TRIM(dim1_name),  N1, dim1) )
               CALL CHECK( NF90_DEF_DIM(ncid, TRIM(dim2_name),  N2, dim2) )
-              CALL CHECK( NF90_DEF_DIM(ncid, TRIM(dim3_name), N3, dim3) )
+              CALL CHECK( NF90_DEF_DIM(ncid, TRIM(dim3_name),  N3, dim3) )
+
 
               !<Define the coordinate variables & output variable
               CALL CHECK( NF90_DEF_VAR(ncid,TRIM(dim1_name),NF90_DOUBLE,dim1,id1))
@@ -138,6 +140,11 @@
                                                       (/dim1,dim2,dim3/), varid) )
               !<Assign missing values
               CALL CHECK( NF90_PUT_ATT(ncid,varid,'_FillValue', missing) )
+
+              !<Add dimension's units
+              CALL CHECK( NF90_PUT_ATT(ncid,id1,"units",TRIM(dim1_unit)) )
+              CALL CHECK( NF90_PUT_ATT(ncid,id2,"units",TRIM(dim2_unit)) )
+              CALL CHECK( NF90_PUT_ATT(ncid,id3,"units",TRIM(dim3_unit)) )
 
               !<End define mode
               CALL CHECK( NF90_ENDDEF(ncid) )
