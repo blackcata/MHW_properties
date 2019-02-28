@@ -15,7 +15,7 @@
 
             IMPLICIT NONE
 
-            INTEGER  :: window, Nt_yr, N_percent
+            INTEGER  :: window, Nt_yr, N_percent, thres
             REAL(KIND=8)  :: percent
 
             REAL(KIND=8),ALLOCATABLE,DIMENSION(:,:,:)  ::  MHWs_dur
@@ -44,6 +44,7 @@
               INTEGER, INTENT(IN)  ::  Nx, Ny, Nt
 
               window     =  5
+              thres      =  5
               percent    =  90.0
               Nt_yr      =  Nt / 365
               N_percent  =  INT( (2*window+1)*(Nt_yr-2)*(percent/100.0) )
@@ -123,15 +124,18 @@
               INTEGER,INTENT(IN)  ::  Nx, Ny
               INTEGER  :: i, j, yr, ind_str
 
+              !<Calculating the intensity of the MHWs
               !$OMP PARALLEL DO private(yr,ind_str)
               DO yr = 1,Nt_yr 
               WRITE(*,*) yr,"YEAR IS PROCESSING"
                  ind_str  =  (yr-1)*365 + 1
                  sst_anom(:,:,ind_str:ind_str+365-1)  =                         &
-                 sst_data(:,:,ind_str:ind_str+365-1)  -  sst_percentile
+                 sst_data(:,:,ind_str:ind_str+365-1)  -  sst_clim
               END DO 
               !OMP END PARALLEL
 
+              !<Missing value treatments
+              !$OMP PARALLEL DO private(i,j)
               DO j = 1,Ny
                 DO i = 1,Nx
                     IF ( abs( sst_data(i,j,1) - missing ) < 1.0e+1 ) THEN 
@@ -139,6 +143,7 @@
                     END IF
                 END DO 
               END DO 
+              !OMP END PARALLEL
 
           END SUBROUTINE MHW_intensity
 
@@ -158,9 +163,9 @@
               INTEGER  :: i, j, it,  yr, tmp, ind_str, ind_end
               REAL(KIND=8) :: diff, diff_pre
 
-              !$OMP PARALLEL DO private(i,j,yr,it,ind_str,ind_end,tmp,diff,diff_pre)
               DO j = 1,Ny
                 WRITE(*,*) j,"th LATITUDE IS PROCESSING"
+                !$OMP PARALLEL DO private(i,yr,it,ind_str,ind_end,tmp,diff,diff_pre)
                 DO i = 1,Nx
 
                     IF ( abs( sst_data(i,j,1) - missing ) < 1.0e+1 ) THEN 
@@ -173,6 +178,7 @@
                       DO it = 1,365
                           tmp  =  (yr-1) * 365 
 
+                          !<Calculate diffrence between percentile and time series
                           diff  = sst_data(i,j,tmp+it) - sst_percentile(i,j,it)
 
                           IF (tmp + it > 1) THEN
@@ -182,12 +188,16 @@
                               diff_pre = 0.0
                           END IF
 
+                          !<T_s and T_e criteria : More than specific percentile
                           IF( diff >= 0 .AND. diff_pre <= 0 )  ind_str = tmp + it
                           IF( diff <= 0 .AND. diff_pre >= 0 )  THEN
                               ind_end = tmp + it 
                               
-                              IF (ind_end - ind_str >= 5) THEN 
-                                  MHWs_dur(i,j,ind_str:ind_end) = 1.0
+                              !<T_s and T_e criteria : Persist 5 days
+                              IF (ind_end - ind_str >= thres) THEN 
+                                  !MHWs_dur(i,j,ind_str:ind_end) = 1.0
+                                  MHWs_dur(i,j,ind_str:ind_end-1) =               &
+                                                   sst_anom(i,j,ind_str:ind_end-1)
                               END IF
                           END IF 
 
@@ -196,8 +206,8 @@
                     END DO 
 
                 END DO 
+                !OMP END PARALLEL
               END DO 
-              !OMP END PARALLEL
 
           END SUBROUTINE MHW_duration
 
