@@ -160,7 +160,7 @@
 
               IMPLICIT NONE            
               INTEGER,INTENT(IN)  ::  Nx, Ny
-              INTEGER  :: i, j, it,  yr, tmp, ind_str, ind_end
+              INTEGER  :: i, j, it,  yr, tmp, ind_str, ind_end, day_ind
               REAL(KIND=8) :: diff, diff_pre
 
               DO j = 1,Ny
@@ -182,8 +182,11 @@
                           diff  = sst_data(i,j,tmp+it) - sst_percentile(i,j,it)
 
                           IF (tmp + it > 1) THEN
+                              IF (it == 1) THEN ; day_ind = 365 
+                              ELSE              ; day_ind = it - 1 
+                              END IF  
                               diff_pre  = sst_data(i,j,tmp+it-1)                &
-                                                  - sst_percentile(i,j,it-1)
+                                                  - sst_percentile(i,j,day_ind)
                           ELSE
                               diff_pre = 0.0
                           END IF
@@ -200,7 +203,6 @@
                                                    sst_anom(i,j,ind_str:ind_end-1)
                               END IF
                           END IF 
-
 
                       END DO
                     END DO 
