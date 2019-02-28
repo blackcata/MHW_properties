@@ -182,6 +182,7 @@
                           diff  = sst_data(i,j,tmp+it) - sst_percentile(i,j,it)
 
                           IF (tmp + it > 1) THEN
+                              !<Periodicity of the 1 year
                               IF (it == 1) THEN ; day_ind = 365 
                               ELSE              ; day_ind = it - 1 
                               END IF  
@@ -192,14 +193,14 @@
                           END IF
 
                           !<T_s and T_e criteria : More than specific percentile
-                          IF( diff >= 0 .AND. diff_pre <= 0 )  ind_str = tmp + it
-                          IF( diff <= 0 .AND. diff_pre >= 0 )  THEN
+                          IF( diff >= 0 .AND. diff_pre <= 0 ) ind_str = tmp + it
+                          IF( diff <= 0 .AND. diff_pre >= 0 ) THEN
                               ind_end = tmp + it 
                               
                               !<T_s and T_e criteria : Persist 5 days
                               IF (ind_end - ind_str >= thres) THEN 
                                   !MHWs_dur(i,j,ind_str:ind_end) = 1.0
-                                  MHWs_dur(i,j,ind_str:ind_end-1) =               &
+                                  MHWs_dur(i,j,ind_str:ind_end-1) =             &
                                                    sst_anom(i,j,ind_str:ind_end-1)
                               END IF
                           END IF 
