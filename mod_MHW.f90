@@ -15,7 +15,7 @@
 
             IMPLICIT NONE
 
-            INTEGER  :: window, Nt_yr, N_percent, thres
+            INTEGER  :: window, Nt_yr, N_percent, thres, window_sm
             REAL(KIND=8)  :: percent
 
             REAL(KIND=8),ALLOCATABLE,DIMENSION(:,:,:)  ::  MHWs_dur
@@ -45,6 +45,7 @@
 
               window     =  5
               thres      =  5
+              window_sm  =  15
               percent    =  90.0
               Nt_yr      =  Nt / 365
               N_percent  =  INT( (2*window+1)*(Nt_yr-2)*(percent/100.0) )
@@ -107,7 +108,60 @@
 
               END DO 
 
+              CALL MHW_moving_average(sst_clim,Nx,Ny,365) 
+              CALL MHW_moving_average(sst_percentile,Nx,Ny,365) 
+
           END SUBROUTINE MHW_clim_percent
+
+!------------------------------------------------------------------------------!
+!                                                                              !
+!   SUBROUTINE : MHW_moving_average                                            !
+!                                                                              !
+!   PURPOSE : Smoothing with specific window moving average                    !
+!                                                                              !
+!                                                             2019.02.28.K.Noh !
+!                                                                              !
+!------------------------------------------------------------------------------!
+         SUBROUTINE MHW_moving_average(data_input,N1,N2,N3)
+
+              IMPLICIT NONE            
+              INTEGER,INTENT(IN)  ::  N1, N2, N3 
+              REAL(KIND=8),INTENT(INOUT)  :: data_input(1:N1, 1:N2, 1:N3)
+
+              INTEGER :: it, i, j, tt, ind_str, ind_end, ind_tmp
+              REAL(KIND=8)  ::  data_tmp(1:N1, 1:N2, 1:N3), tmp_sum
+
+              DO j = 1,N2
+                DO i = 1,N1
+
+                    IF ( abs( data_input(i,j,1) - missing ) < 1.0e+1 ) THEN 
+                        data_tmp(i,j,:)  =  missing
+                        CYCLE
+                    END IF
+
+                    DO it = 1,N3
+                        ind_str  =  it - window_sm 
+                        ind_end  =  it + window_sm 
+
+                        tmp_sum  =  0.0
+                        DO tt = ind_str, ind_end
+                            IF     ( tt < 1 ) THEN   ; ind_tmp  =  365 + tt 
+                            ELSEIF ( tt > 365 ) THEN ; ind_tmp  =  tt - 365 
+                            ELSE                     ; ind_tmp  =  tt
+                            END IF
+
+                            tmp_sum = tmp_sum + data_input(i,j,ind_tmp)
+                        END DO 
+
+                        data_tmp(i,j,it)  =  tmp_sum / (2*window_sm+1)
+                    END DO 
+
+                END DO 
+              END DO 
+              
+              data_input  =  data_tmp
+
+          END SUBROUTINE MHW_moving_average
 
 !------------------------------------------------------------------------------!
 !                                                                              !
@@ -199,7 +253,7 @@
                               
                               !<T_s and T_e criteria : Persist 5 days
                               IF (ind_end - ind_str >= thres) THEN 
-                                  !MHWs_dur(i,j,ind_str:ind_end) = 1.0
+                                  !MHWs_dur(i,j,ind_str:ind_end-1) = 1.0
                                   MHWs_dur(i,j,ind_str:ind_end-1) =             &
                                                    sst_anom(i,j,ind_str:ind_end-1)
                               END IF
