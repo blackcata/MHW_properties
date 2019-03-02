@@ -122,44 +122,51 @@
 !                                                             2019.02.28.K.Noh !
 !                                                                              !
 !------------------------------------------------------------------------------!
-         SUBROUTINE MHW_moving_average(data_input,N1,N2,N3)
+         SUBROUTINE MHW_moving_average(data_input,Nx,Ny,Nt)
 
               IMPLICIT NONE            
-              INTEGER,INTENT(IN)  ::  N1, N2, N3 
-              REAL(KIND=8),INTENT(INOUT)  :: data_input(1:N1, 1:N2, 1:N3)
+              INTEGER,INTENT(IN)  ::  Nx, Ny, Nt 
+              REAL(KIND=8),INTENT(INOUT)  :: data_input(1:Nx, 1:Ny, 1:Nt)
 
               INTEGER :: it, i, j, tt, ind_str, ind_end, ind_tmp
-              REAL(KIND=8)  ::  data_tmp(1:N1, 1:N2, 1:N3), tmp_sum
+              REAL(KIND=8)  ::  data_tmp(1:Nx, 1:Ny, 1:Nt), tmp_sum
+              PRINT*,Nx,Ny,Nt
 
-              DO j = 1,N2
-                DO i = 1,N1
+              data_tmp(1:Nx,1:Ny,1:Nt)   =  0.0
+
+              DO j = 1,Ny
+                WRITE(*,*) j,"th LATITUDE IS PROCESSING"
+                !$OMP PARALLEL DO private(i,it,tt,ind_str,ind_end,tmp_sum,ind_tmp)
+                DO i = 1,Nx
 
                     IF ( abs( data_input(i,j,1) - missing ) < 1.0e+1 ) THEN 
                         data_tmp(i,j,:)  =  missing
                         CYCLE
                     END IF
 
-                    DO it = 1,N3
+                    DO it = 1,Nt
                         ind_str  =  it - window_sm 
                         ind_end  =  it + window_sm 
 
                         tmp_sum  =  0.0
+
                         DO tt = ind_str, ind_end
-                            IF     ( tt < 1 ) THEN   ; ind_tmp  =  365 + tt 
-                            ELSEIF ( tt > 365 ) THEN ; ind_tmp  =  tt - 365 
-                            ELSE                     ; ind_tmp  =  tt
-                            END IF
+                            ind_tmp = tt
+                            IF (tt < 1)   ind_tmp = 365 + tt
+                            IF (tt > 365) ind_tmp = tt - 365
 
                             tmp_sum = tmp_sum + data_input(i,j,ind_tmp)
+                            IF (i==1.AND.j==1.AND.it==1) WRITE(*,*) data_input(i,j,ind_tmp)
                         END DO 
 
                         data_tmp(i,j,it)  =  tmp_sum / (2*window_sm+1)
                     END DO 
 
                 END DO 
+                !OMP END PARALLEL
               END DO 
-              
-              data_input  =  data_tmp
+
+              data_input(1:Nx,1:Ny,1:Nt)  =  data_tmp(1:Nx,1:Ny,1:Nt)
 
           END SUBROUTINE MHW_moving_average
 
@@ -223,6 +230,7 @@
                 DO i = 1,Nx
 
                     IF ( abs( sst_data(i,j,1) - missing ) < 1.0e+1 ) THEN 
+                    PRINT*,"MISSING"
                         MHWs_dur(i,j,:)  =  missing
                         CONTINUE
                     END IF
@@ -253,9 +261,9 @@
                               
                               !<T_s and T_e criteria : Persist 5 days
                               IF (ind_end - ind_str >= thres) THEN 
-                                  !MHWs_dur(i,j,ind_str:ind_end-1) = 1.0
-                                  MHWs_dur(i,j,ind_str:ind_end-1) =             &
-                                                   sst_anom(i,j,ind_str:ind_end-1)
+                                  MHWs_dur(i,j,ind_str:ind_end-1) = 1.0
+                                  !MHWs_dur(i,j,ind_str:ind_end-1) =             &
+                                  !                 sst_anom(i,j,ind_str:ind_end-1)
                               END IF
                           END IF 
 
