@@ -20,16 +20,17 @@
             !-----------------------------------------------------------------!
             !                     Read the file's dimension                   !
             !-----------------------------------------------------------------!
-            N1 = 1440 ; N2 = 720 ; N3 = 1095
+            N1 = 1440 ; N2 = 720 ; N3 = 13477
             missing    =  -9.96921e+36
 
             dir_name   =  "DATA/OISST_v2"
-            file_name  =  "sst_daily_mean.1982-1984.v2.nc"
+            file_name  =  "sst_daily_mean.1982-2018.v2.nc"
             WRITE(*,*)  "------------BASIC SETUP COMPLETED------------"
+            WRITE(*,*)  " "
             
             !<Read the time dimension
             N  =  N3
-            var_name   =  "lon"
+            var_name   =  "time"
             ALLOCATE(  time(1:N) ) 
             CALL netCDF_read_1d( time ) 
 
@@ -55,6 +56,7 @@
             CALL netCDF_read_3d(sst_data)
             
             WRITE(*,*)  "----------READING PROCESS COMPLETED----------"
+            WRITE(*,*)  " "
 
             !-----------------------------------------------------------------!
             !                 Calculate the 11 day window mean                !
@@ -65,6 +67,8 @@
             CALL MHW_duration(N1,N2)
 
             WRITE(*,*)  "--------CALCULATING PROCESS COMPLETED--------"
+            WRITE(*,*)  " "
+            DEALLOCATE(sst_data)
 
             !-----------------------------------------------------------------!
             !                        Write the SST data                       !
@@ -73,14 +77,20 @@
             dir_name   =  "RESULT"
             dim1_name  =  "lon" ; dim2_name = "lat" ; dim3_name = "time"
 
+            dim1_unit  =  "degrees_east" 
+            dim2_unit  =  "degrees_north"
+            dim3_unit  =  "days since 1800-01-01 00:00:00"
+
             !<Write the intensity contour of MHWs
-            file_name  =  "OISST_v2_win_11_daily_intensity.1982-1984.nc"
+            file_name  =  "OISST_v2_win_11_daily_intensity.1982-2018.nc"
             var_name   =  "sst_anom"
+            N1 = 1440 ; N2 = 720 ; N3 = 13477
             CALL netCDF_write_3d(sst_anom,lon,lat,time)
             
             !<Write the duration contour of MHWs
-            file_name  =  "OISST_v2_win_11_daily_duration.1982-1984.nc"
+            file_name  =  "OISST_v2_win_11_daily_duration.1982-2018.nc"
             var_name   =  "MHWs_dur"
+            N1 = 1440 ; N2 = 720 ; N3 = 13477
             CALL netCDF_write_3d(MHWs_dur,lon,lat,time)
             
             DEALLOCATE(time)  ;  ALLOCATE(time(1:365))
@@ -88,12 +98,12 @@
             N3 = 365
 
             !<Write the climatological mean 
-            file_name  =  "OISST_v2_win_11_daily_clim_mean.1982-1984.nc"
+            file_name  =  "OISST_v2_win_11_daily_clim_mean.1982-2018.nc"
             var_name   =  "sst_clim"
             CALL netCDF_write_3d(sst_clim,lon,lat,time)
 
             !<Write the specific percentile data
-            file_name  =  "OISST_v2_win_11_daily_percent.1982-1984.nc"
+            file_name  =  "OISST_v2_win_11_daily_percent.1982-2018.nc"
             var_name   =  "sst_percentile"
             CALL netCDF_write_3d(sst_percentile,lon,lat,time)
 

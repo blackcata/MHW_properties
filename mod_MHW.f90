@@ -50,9 +50,9 @@
               Nt_yr      =  Nt / 365
               N_percent  =  INT( (2*window+1)*(Nt_yr-2)*(percent/100.0) )
 
-              ALLOCATE( sst_clim(1:Nx,1:Ny,1:365) ) 
+!              ALLOCATE( sst_clim(1:Nx,1:Ny,1:365) ) 
               ALLOCATE( sst_percentile(1:Nx,1:Ny,1:365) )
-              ALLOCATE( sst_anom(1:Nx,1:Ny,1:Nt) ) 
+!              ALLOCATE( sst_anom(1:Nx,1:Ny,1:Nt) ) 
               ALLOCATE( MHWs_dur(1:Nx,1:Ny,1:Nt) ) 
               
           END SUBROUTINE MHW_setup
@@ -130,7 +130,6 @@
 
               INTEGER :: it, i, j, tt, ind_str, ind_end, ind_tmp
               REAL(KIND=8)  ::  data_tmp(1:Nx, 1:Ny, 1:Nt), tmp_sum
-              PRINT*,Nx,Ny,Nt
 
               data_tmp(1:Nx,1:Ny,1:Nt)   =  0.0
 
@@ -230,7 +229,6 @@
                 DO i = 1,Nx
 
                     IF ( abs( sst_data(i,j,1) - missing ) < 1.0e+1 ) THEN 
-                    PRINT*,"MISSING"
                         MHWs_dur(i,j,:)  =  missing
                         CONTINUE
                     END IF
@@ -261,9 +259,13 @@
                               
                               !<T_s and T_e criteria : Persist 5 days
                               IF (ind_end - ind_str >= thres) THEN 
-                                  MHWs_dur(i,j,ind_str:ind_end-1) = 1.0
+                                  !<The time when MHWs are occurred
+                                  !MHWs_dur(i,j,ind_str:ind_end-1) = 1.0
+                                  !<The MHWs time with intensity
                                   !MHWs_dur(i,j,ind_str:ind_end-1) =             &
                                   !                 sst_anom(i,j,ind_str:ind_end-1)
+                                  !<The MHWs starting day and duration
+                                  MHWs_dur(i,j,ind_str) = (ind_end - ind_str + 1)
                               END IF
                           END IF 
 
