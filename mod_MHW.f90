@@ -50,9 +50,9 @@
               Nt_yr      =  Nt / 365
               N_percent  =  INT( (2*window+1)*(Nt_yr-2)*(percent/100.0) )
 
-!              ALLOCATE( sst_clim(1:Nx,1:Ny,1:365) ) 
+              ALLOCATE( sst_clim(1:Nx,1:Ny,1:365) ) 
               ALLOCATE( sst_percentile(1:Nx,1:Ny,1:365) )
-!              ALLOCATE( sst_anom(1:Nx,1:Ny,1:Nt) ) 
+              ALLOCATE( sst_anom(1:Nx,1:Ny,1:Nt) ) 
               ALLOCATE( MHWs_dur(1:Nx,1:Ny,1:Nt) ) 
               
           END SUBROUTINE MHW_setup
