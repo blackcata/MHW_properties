@@ -14,7 +14,7 @@
             USE mod_MHWs
 
             IMPLICIT NONE
-            INTEGER :: it
+            INTEGER :: it, ind_str
             CHARACTER(LEN=10)  :: char_str, char_end, char_per1, char_per2
 
             WRITE(*,*) " "
@@ -22,7 +22,7 @@
             !-----------------------------------------------------------------!
             !                     Read the file's dimension                   !
             !-----------------------------------------------------------------!
-            yr_str  =  1982 
+            yr_str  =  1982
             yr_end  =  2016
             Nt_yr   =  yr_end - yr_str + 1
 
@@ -37,22 +37,22 @@
             WRITE(*,*)  " "
             
             !<Read the time dimension
-            N  =  N3
+            N  =  N3   ;  ind_str  = 365*(yr_str-1982) + 1 
             var_name   =  "time"
             ALLOCATE(  time(1:N) ) 
-            CALL netCDF_read_1d( time ) 
+            CALL netCDF_read_1d(time, ind_str) 
 
             !<Read the latitude dimension
             N  =  N2 
             var_name   =  "lat"
             ALLOCATE(  lat(1:N) ) 
-            CALL netCDF_read_1d( lat ) 
+            CALL netCDF_read_1d(lat, 1) 
 
             !<Read the longitude dimension
             N  =  N1 
             var_name   =  "lon"
             ALLOCATE(  lon(1:N) ) 
-            CALL netCDF_read_1d( lon ) 
+            CALL netCDF_read_1d(lon, 1) 
 
             !-----------------------------------------------------------------!
             !                         Read the SST data                       !
@@ -61,7 +61,7 @@
 
             ALLOCATE( sst_data(1:N1, 1:N2, 1:N3) ) 
             !<Read the SST data
-            CALL netCDF_read_3d(sst_data)
+            CALL netCDF_read_3d(sst_data, ind_str)
             
             WRITE(*,*)  "----------READING PROCESS COMPLETED----------"
             WRITE(*,*)  " "
