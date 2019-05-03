@@ -23,6 +23,7 @@
             REAL(KIND=8),ALLOCATABLE,DIMENSION(:)      ::  lat, lon, time  
             REAL(KIND=8),ALLOCATABLE,DIMENSION(:,:,:)  ::  sst_data
             REAL(KIND=8),ALLOCATABLE,DIMENSION(:,:,:)  ::  sst_clim, sst_percentile
+            REAL(KIND=8),ALLOCATABLE,DIMENSION(:,:,:)  ::  sst_percentile_2
             REAL(KIND=8),ALLOCATABLE,DIMENSION(:,:,:)  ::  sst_anom
 
             SAVE
@@ -46,12 +47,13 @@
               window     =  5
               thres      =  5
               window_sm  =  15
-              percent    =  90.0
+              percent    =  75.0
               Nt_yr      =  Nt / 365
               N_percent  =  INT( (2*window+1)*(Nt_yr-2)*(percent/100.0) )
 
 !              ALLOCATE( sst_clim(1:Nx,1:Ny,1:365) ) 
               ALLOCATE( sst_percentile(1:Nx,1:Ny,1:365) )
+              ALLOCATE( sst_percentile_2(1:Nx,1:Ny,1:365) )
 !              ALLOCATE( sst_anom(1:Nx,1:Ny,1:Nt) ) 
               ALLOCATE( MHWs_dur(1:Nx,1:Ny,1:Nt) ) 
               
@@ -221,11 +223,12 @@
               IMPLICIT NONE            
               INTEGER,INTENT(IN)  ::  Nx, Ny
               INTEGER  :: i, j, it,  yr, tmp, ind_str, ind_end, day_ind
-              REAL(KIND=8) :: diff, diff_pre
+              REAL(KIND=8) :: diff_str, diff_str_pre, diff_end, diff_end_pre
+              LOGICAL      :: start_fix, end_fix
 
               DO j = 1,Ny
                 WRITE(*,*) j,"th LATITUDE IS PROCESSING"
-                !$OMP PARALLEL DO private(i,yr,it,ind_str,ind_end,tmp,diff,diff_pre)
+                !$OMP PARALLEL DO private(i,yr,it,ind_str,ind_end,tmp,diff_str,diff_str_pre,diff_end,diff_end_pre,start_fix,end_fix)
                 DO i = 1,Nx
 
                     IF ( abs( sst_data(i,j,1) - missing ) < 1.0e+1 ) THEN 
@@ -234,38 +237,62 @@
                     END IF
 
                     ind_str = 0  ;  ind_end = 0 
+                    start_fix  =  .TRUE.
+                    end_fix    =  .FALSE. 
                     DO yr = 1,Nt_yr
                       DO it = 1,365
                           tmp  =  (yr-1) * 365 
 
                           !<Calculate diffrence between percentile and time series
-                          diff  = sst_data(i,j,tmp+it) - sst_percentile(i,j,it)
+                          diff_str  = sst_data(i,j,tmp+it) - sst_percentile(i,j,it)
+                          diff_end  = sst_data(i,j,tmp+it) - sst_percentile_2(i,j,it)
 
                           IF (tmp + it > 1) THEN
                               !<Periodicity of the 1 year
                               IF (it == 1) THEN ; day_ind = 365 
                               ELSE              ; day_ind = it - 1 
                               END IF  
-                              diff_pre  = sst_data(i,j,tmp+it-1)                &
+                              diff_str_pre     = sst_data(i,j,tmp+it-1)         &
                                                   - sst_percentile(i,j,day_ind)
+                                                  
+                              diff_end_pre  =  sst_data(i,j,tmp+it-1)           &
+                                                 - sst_percentile_2(i,j,day_ind)
                           ELSE
-                              diff_pre = 0.0
+                              diff_str_pre = 0.0
+                              diff_end_pre = 0.0
                           END IF
 
-                          !<T_s and T_e criteria : More than specific percentile
-                          IF( diff >= 0 .AND. diff_pre <= 0 ) ind_str = tmp + it
-                          IF( diff <= 0 .AND. diff_pre >= 0 ) THEN
-                              ind_end = tmp + it 
+                          !<T_s and T_e criteria (90/90) : More than specific percentile
+                          IF( start_fix .AND. diff_str >= 0 .AND. diff_str_pre <= 0 ) THEN
+                              ind_str    =  tmp + it 
+                              start_fix  = .FALSE.
+                              end_fix    = .TRUE.
+                          END IF
+
+                          !<T_s and T_e criteria (90/90) : Persist 5 days
+                          IF( end_fix .AND. diff_str <= 0 .AND. diff_str_pre >= 0 ) THEN
+                              ind_end    =  tmp + it   
+                              IF ( ind_end - ind_str <= thres) THEN 
+                                  start_fix  =  .TRUE.
+                                  end_fix    =  .FALSE.
+                              END IF 
+                          END IF
+
+                          !<T_s and T_e criteria (90/75)
+                          IF( end_fix .AND. diff_end <= 0 .AND. diff_end_pre >= 0 ) THEN
+                              ind_end    =  tmp + it 
+                              start_fix  = .TRUE.
+                              end_fix    = .FALSE.
                               
                               !<T_s and T_e criteria : Persist 5 days
                               IF (ind_end - ind_str >= thres) THEN 
                                   !<The time when MHWs are occurred
-                                  !MHWs_dur(i,j,ind_str:ind_end-1) = 1.0
-                                  !<The MHWs time with intensity
-                                  !MHWs_dur(i,j,ind_str:ind_end-1) =             &
+                                  !MHWs_dur(i,j,ind_str:ind_end-1) =            &
                                   !                 sst_anom(i,j,ind_str:ind_end-1)
                                   !<The MHWs starting day and duration
-                                  MHWs_dur(i,j,ind_str) = (ind_end - ind_str + 1)
+                                  !MHWs_dur(i,j,ind_str) = (ind_end - ind_str + 1)
+                                  !<The MHWs ending day and duration
+                                  MHWs_dur(i,j,ind_end) = (ind_end - ind_str + 1)
                               END IF
                           END IF 
 
