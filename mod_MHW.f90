@@ -22,7 +22,8 @@
 
             REAL(KIND=8),ALLOCATABLE,DIMENSION(:)      ::  lat, lon, time  
             REAL(KIND=8),ALLOCATABLE,DIMENSION(:,:,:)  ::  sst_data
-            REAL(KIND=8),ALLOCATABLE,DIMENSION(:,:,:)  ::  sst_clim, sst_percentile
+            REAL(KIND=8),ALLOCATABLE,DIMENSION(:,:,:)  ::  sst_clim
+            REAL(KIND=8),ALLOCATABLE,DIMENSION(:,:,:)  ::  sst_percentile_1
             REAL(KIND=8),ALLOCATABLE,DIMENSION(:,:,:)  ::  sst_percentile_2
             REAL(KIND=8),ALLOCATABLE,DIMENSION(:,:,:)  ::  sst_anom
 
@@ -52,7 +53,7 @@
               N_percent  =  INT( (2*window+1)*(Nt_yr-2)*(percent/100.0) )
 
               ALLOCATE( sst_clim(1:Nx,1:Ny,1:365) ) 
-              ALLOCATE( sst_percentile(1:Nx,1:Ny,1:365) )
+              ALLOCATE( sst_percentile_1(1:Nx,1:Ny,1:365) )
               ALLOCATE( sst_percentile_2(1:Nx,1:Ny,1:365) )
               ALLOCATE( sst_anom(1:Nx,1:Ny,1:Nt) ) 
               ALLOCATE( MHWs_dur(1:Nx,1:Ny,1:Nt) ) 
@@ -68,12 +69,14 @@
 !                                                             2019.02.21.K.Noh !
 !                                                                              !
 !------------------------------------------------------------------------------!
-          SUBROUTINE MHW_clim_percent(Nx,Ny)
+          SUBROUTINE MHW_clim_percent(Nx,Ny,sst_percentile)
 
               IMPLICIT NONE            
 
               INTEGER  ::  i, j, it, yr, tmp_ind, time_ind
               INTEGER,INTENT(IN)  :: Nx, Ny
+              REAL(KIND=8),INTENT(INOUT) :: sst_percentile(1:Nx,1:Ny,1:365)
+
               REAL(KIND=8)  :: ts_tmp( 1:(2*window+1)*(Nt_yr-2) )
               REAL(KIND=8)  :: sst_tmp( 1:Nx,1:Ny,1:(2*window+1)*(Nt_yr-2) )
 
@@ -244,7 +247,7 @@
                           tmp  =  (yr-1) * 365 
 
                           !<Calculate diffrence between percentile and time series
-                          diff_str  = sst_data(i,j,tmp+it) - sst_percentile(i,j,it)
+                          diff_str  = sst_data(i,j,tmp+it) - sst_percentile_1(i,j,it)
                           diff_end  = sst_data(i,j,tmp+it) - sst_percentile_2(i,j,it)
 
                           IF (tmp + it > 1) THEN
@@ -253,7 +256,7 @@
                               ELSE              ; day_ind = it - 1 
                               END IF  
                               diff_str_pre     = sst_data(i,j,tmp+it-1)         &
-                                                  - sst_percentile(i,j,day_ind)
+                                                  - sst_percentile_1(i,j,day_ind)
                                                   
                               diff_end_pre  =  sst_data(i,j,tmp+it-1)           &
                                                  - sst_percentile_2(i,j,day_ind)
