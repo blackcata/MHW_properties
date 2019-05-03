@@ -50,10 +50,11 @@
 !                                                             2019.02.21.K.Noh !
 !                                                                              !
 !------------------------------------------------------------------------------!
-          SUBROUTINE netCDF_read_1d(data_input)
+          SUBROUTINE netCDF_read_1d(data_input,ind_str)
 
               IMPLICIT NONE            
               
+              INTEGER,INTENT(IN)          ::  ind_str
               REAL(KIND=8),INTENT(INOUT)  ::  data_input(1:N)
 
               path_name  = "./"//TRIM(dir_name)//"/"//TRIM(file_name)
@@ -65,7 +66,8 @@
               CALL CHECK( NF90_INQ_VARID(ncid, TRIM(var_name), varid) )
 
               !< Read the data
-              CALL CHECK( NF90_GET_VAR(ncid, varid, data_input) )
+              CALL CHECK( NF90_GET_VAR(ncid, varid, data_input,                 &
+                                       start = (/ind_str/)) )
 
               !< Close the file
               CALL CHECK( NF90_CLOSE(ncid) )
@@ -81,10 +83,11 @@
 !                                                             2019.02.21.K.Noh !
 !                                                                              !
 !------------------------------------------------------------------------------!
-          SUBROUTINE netCDF_read_3d(data_input)
+          SUBROUTINE netCDF_read_3d(data_input, ind_str)
 
               IMPLICIT NONE            
              
+              INTEGER,INTENT(IN)          ::  ind_str
               REAL(KIND=8),INTENT(INOUT)  ::  data_input(1:N1,1:N2,1:N3)
 
               path_name  = "./"//TRIM(dir_name)//"/"//TRIM(file_name)
@@ -96,7 +99,8 @@
               CALL CHECK( NF90_INQ_VARID(ncid, TRIM(var_name), varid) )
 
               !< Read the data
-              CALL CHECK( NF90_GET_VAR(ncid, varid, data_input) )
+              CALL CHECK( NF90_GET_VAR(ncid, varid, data_input,                 &
+                                       start = (/1, 1, ind_str/)) )
 
               !< Close the file
               CALL CHECK( NF90_CLOSE(ncid) )
