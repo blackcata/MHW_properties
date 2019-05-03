@@ -247,33 +247,37 @@
                           tmp  =  (yr-1) * 365 
 
                           !<Calculate diffrence between percentile and time series
-                          diff_str  = sst_data(i,j,tmp+it) - sst_percentile_1(i,j,it)
-                          diff_end  = sst_data(i,j,tmp+it) - sst_percentile_2(i,j,it)
+                          diff_str  = sst_data(i,j,tmp+it)                      &
+                                    - sst_percentile_1(i,j,it)
+                          diff_end  = sst_data(i,j,tmp+it)                      &
+                                    - sst_percentile_2(i,j,it)
 
                           IF (tmp + it > 1) THEN
                               !<Periodicity of the 1 year
                               IF (it == 1) THEN ; day_ind = 365 
                               ELSE              ; day_ind = it - 1 
                               END IF  
-                              diff_str_pre     = sst_data(i,j,tmp+it-1)         &
-                                                  - sst_percentile_1(i,j,day_ind)
+                              diff_str_pre  =  sst_data(i,j,tmp+it-1)         &
+                                            -  sst_percentile_1(i,j,day_ind)
                                                   
                               diff_end_pre  =  sst_data(i,j,tmp+it-1)           &
-                                                 - sst_percentile_2(i,j,day_ind)
+                                            -  sst_percentile_2(i,j,day_ind)
                           ELSE
                               diff_str_pre = 0.0
                               diff_end_pre = 0.0
                           END IF
 
                           !<T_s and T_e criteria (90/90) : More than specific percentile
-                          IF( start_fix .AND. diff_str >= 0 .AND. diff_str_pre <= 0 ) THEN
+                          IF( start_fix .AND.                                   &
+                              diff_str >= 0 .AND. diff_str_pre <= 0 ) THEN
                               ind_str    =  tmp + it 
                               start_fix  = .FALSE.
                               end_fix    = .TRUE.
                           END IF
 
                           !<T_s and T_e criteria (90/90) : Persist 5 days
-                          IF( end_fix .AND. diff_str <= 0 .AND. diff_str_pre >= 0 ) THEN
+                          IF( end_fix .AND.                                     &
+                              diff_str <= 0 .AND. diff_str_pre >= 0 ) THEN
                               ind_end    =  tmp + it   
                               IF ( ind_end - ind_str <= thres) THEN 
                                   start_fix  =  .TRUE.
@@ -282,7 +286,8 @@
                           END IF
 
                           !<T_s and T_e criteria (90/75)
-                          IF( end_fix .AND. diff_end <= 0 .AND. diff_end_pre >= 0 ) THEN
+                          IF( end_fix .AND.                                     &
+                              diff_end <= 0 .AND. diff_end_pre >= 0 ) THEN
                               ind_end    =  tmp + it 
                               start_fix  = .TRUE.
                               end_fix    = .FALSE.
