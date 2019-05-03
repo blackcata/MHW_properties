@@ -15,6 +15,7 @@
 
             IMPLICIT NONE
 
+            INTEGER  :: yr_str, yr_end
             INTEGER  :: window, Nt_yr, N_percent, thres, window_sm
             REAL(KIND=8)  :: percent
 
@@ -48,7 +49,6 @@
               window     =  5
               thres      =  5
               window_sm  =  15
-              Nt_yr      =  Nt / 365
               N_percent  =  INT( (2*window+1)*(Nt_yr-2)*(percent/100.0) )
 
               ALLOCATE( sst_clim(1:Nx,1:Ny,1:365) ) 
