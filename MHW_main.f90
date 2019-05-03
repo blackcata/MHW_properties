@@ -20,7 +20,7 @@
             !-----------------------------------------------------------------!
             !                     Read the file's dimension                   !
             !-----------------------------------------------------------------!
-            N1 = 1440 ; N2 = 720 ; N3 = 13477
+            N1 = 1440 ; N2 = 720 ; N3 = 12775
             missing    =  -9.96921e+36
 
             dir_name   =  "DATA/OISST_v2"
@@ -55,6 +55,7 @@
             !<Read the SST data
             CALL netCDF_read_3d(sst_data)
             
+
             WRITE(*,*)  "----------READING PROCESS COMPLETED----------"
             WRITE(*,*)  " "
 
@@ -62,7 +63,9 @@
             !                 Calculate the 11 day window mean                !
             !-----------------------------------------------------------------!
             CALL MHW_setup(N1,N2,N3)
-            CALL MHW_clim_percent(N1,N2)
+            percent  =  90.0 ;  CALL MHW_clim_percent(N1,N2,sst_percentile_1)
+            percent  =  75.0 ;  CALL MHW_clim_percent(N1,N2,sst_percentile_2)
+
             CALL MHW_intensity(N1,N2)
             CALL MHW_duration(N1,N2)
 
@@ -84,13 +87,13 @@
             !<Write the intensity contour of MHWs
             file_name  =  "OISST_v2_win_11_daily_intensity.1982-2018.nc"
             var_name   =  "sst_anom"
-            N1 = 1440 ; N2 = 720 ; N3 = 13477
+            N1 = 1440 ; N2 = 720 ; N3 = 12775
             CALL netCDF_write_3d(sst_anom,lon,lat,time)
             
             !<Write the duration contour of MHWs
             file_name  =  "OISST_v2_win_11_daily_duration.1982-2018.nc"
             var_name   =  "MHWs_dur"
-            N1 = 1440 ; N2 = 720 ; N3 = 13477
+            N1 = 1440 ; N2 = 720 ; N3 = 12775
             CALL netCDF_write_3d(MHWs_dur,lon,lat,time)
             
             DEALLOCATE(time)  ;  ALLOCATE(time(1:365))
@@ -105,7 +108,7 @@
             !<Write the specific percentile data
             file_name  =  "OISST_v2_win_11_daily_percent.1982-2018.nc"
             var_name   =  "sst_percentile"
-            CALL netCDF_write_3d(sst_percentile,lon,lat,time)
+            CALL netCDF_write_3d(sst_percentile_1,lon,lat,time)
 
             WRITE(*,*)  "--------WRITING PROCESS COMPLETED--------"
 
