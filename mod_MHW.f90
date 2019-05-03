@@ -17,7 +17,7 @@
 
             INTEGER  :: yr_str, yr_end
             INTEGER  :: window, Nt_yr, N_percent, thres, window_sm
-            REAL(KIND=8)  :: percent
+            REAL(KIND=8)  :: percent_1, percent_2
 
             REAL(KIND=8),ALLOCATABLE,DIMENSION(:,:,:)  ::  MHWs_dur
 
@@ -49,7 +49,6 @@
               window     =  5
               thres      =  5
               window_sm  =  15
-              N_percent  =  INT( (2*window+1)*(Nt_yr-2)*(percent/100.0) )
 
               ALLOCATE( sst_clim(1:Nx,1:Ny,1:365) ) 
               ALLOCATE( sst_percentile_1(1:Nx,1:Ny,1:365) )
@@ -68,16 +67,19 @@
 !                                                             2019.02.21.K.Noh !
 !                                                                              !
 !------------------------------------------------------------------------------!
-          SUBROUTINE MHW_clim_percent(Nx,Ny,sst_percentile)
+          SUBROUTINE MHW_clim_percent(Nx,Ny,sst_percentile,percent)
 
               IMPLICIT NONE            
 
               INTEGER  ::  i, j, it, yr, tmp_ind, time_ind
               INTEGER,INTENT(IN)  :: Nx, Ny
+              REAL(KIND=8),INTENT(IN)    :: percent
               REAL(KIND=8),INTENT(INOUT) :: sst_percentile(1:Nx,1:Ny,1:365)
 
               REAL(KIND=8)  :: ts_tmp( 1:(2*window+1)*(Nt_yr-2) )
               REAL(KIND=8)  :: sst_tmp( 1:Nx,1:Ny,1:(2*window+1)*(Nt_yr-2) )
+
+              N_percent  =  INT( (2*window+1)*(Nt_yr-2)*(percent/100.0) )
 
               DO it = 1,365
               WRITE(*,*) it,"DAY IS PROCESSING"
