@@ -48,7 +48,6 @@
               window     =  5
               thres      =  5
               window_sm  =  15
-              percent    =  75.0
               Nt_yr      =  Nt / 365
               N_percent  =  INT( (2*window+1)*(Nt_yr-2)*(percent/100.0) )
 
