@@ -83,11 +83,11 @@
 !                                                             2019.02.21.K.Noh !
 !                                                                              !
 !------------------------------------------------------------------------------!
-          SUBROUTINE netCDF_read_3d(data_input, ind_str)
+          SUBROUTINE netCDF_read_3d(data_input, ind_str1, ind_str2, ind_str3)
 
               IMPLICIT NONE            
              
-              INTEGER,INTENT(IN)          ::  ind_str
+              INTEGER,INTENT(IN)          ::  ind_str1, ind_str2, ind_str3
               REAL(KIND=8),INTENT(INOUT)  ::  data_input(1:N1,1:N2,1:N3)
 
               path_name  = "./"//TRIM(dir_name)//"/"//TRIM(file_name)
@@ -100,7 +100,7 @@
 
               !< Read the data
               CALL CHECK( NF90_GET_VAR(ncid, varid, data_input,                 &
-                                       start = (/1, 1, ind_str/)) )
+                                       start = (/ind_str1, ind_str2, ind_str3/)) )
 
               !< Close the file
               CALL CHECK( NF90_CLOSE(ncid) )
