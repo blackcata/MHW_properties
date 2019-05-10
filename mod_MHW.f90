@@ -15,7 +15,7 @@
 
             IMPLICIT NONE
 
-            INTEGER  :: yr_str, yr_end
+            INTEGER  :: yr_str, yr_end, result_type
             INTEGER  :: window, Nt_yr, N_percent, thres, window_sm
             REAL(KIND=8)  :: percent_1, percent_2
 
@@ -46,9 +46,16 @@
               IMPLICIT NONE            
               INTEGER, INTENT(IN)  ::  Nx, Ny, Nt
 
-              window     =  5
-              thres      =  5
-              window_sm  =  15
+              !---------------------------------------------!
+              !   result_type  :  1 - All date              !
+              !                   2 - Start day             !
+              !                   3 - End day               !
+              !---------------------------------------------!
+              result_type  =  1 
+          
+              window       =  5
+              thres        =  5
+              window_sm    =  15
 
               ALLOCATE( sst_clim(1:Nx,1:Ny,1:365) ) 
               ALLOCATE( sst_percentile_1(1:Nx,1:Ny,1:365) )
@@ -295,13 +302,19 @@
                               
                               !<T_s and T_e criteria : Persist 5 days
                               IF (ind_end - ind_str >= thres) THEN 
-                                  !<The time when MHWs are occurred
-                                  !MHWs_dur(i,j,ind_str:ind_end-1) =            &
-                                  !                 sst_anom(i,j,ind_str:ind_end-1)
-                                  !<The MHWs starting day and duration
-                                  !MHWs_dur(i,j,ind_str) = (ind_end - ind_str + 1)
-                                  !<The MHWs ending day and duration
-                                  MHWs_dur(i,j,ind_end) = (ind_end - ind_str + 1)
+
+                                  IF ( result_type == 1 ) THEN 
+                                    !<The time when MHWs are occurred
+                                    MHWs_dur(i,j,ind_str:ind_end-1) =           &
+                                                 sst_anom(i,j,ind_str:ind_end-1)
+                                  ELSEIF ( result_type == 2 ) THEN 
+                                    !<The MHWs starting day and duration
+                                    MHWs_dur(i,j,ind_str) = (ind_end-ind_str+1)
+                                  ELSEIF ( result_type == 3 ) THEN 
+                                    !<The MHWs ending day and duration
+                                    MHWs_dur(i,j,ind_end) = (ind_end-ind_str+1)
+                                  END IF
+
                               END IF
                           END IF 
 
