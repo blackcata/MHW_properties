@@ -14,8 +14,10 @@
             USE mod_MHWs
 
             IMPLICIT NONE
-            INTEGER :: it, ind_str
+            INTEGER :: it, ind_str1, ind_str2, ind_str3, N_dim, N_dim1, N_dim2
+            INTEGER :: CASE_dim1, CASE_dim2, dN_dim1, dN_dim2 
             CHARACTER(LEN=10)  :: char_str, char_end, char_per1, char_per2
+            CHARACTER(LEN=10)  :: char_dim1, char_dim2
 
             WRITE(*,*) " "
 
@@ -23,12 +25,22 @@
             !                     Read the file's dimension                   !
             !-----------------------------------------------------------------!
             yr_str  =  1982
-            yr_end  =  2016
+            yr_end  =  2017
+
+            N_dim1   =  4              ;  N_dim2   =  2
+            dN_dim1  =  1440 / N_dim1  ;  dN_dim2  =  720 / N_dim2
+            N_dim  =  N_dim1 * N_dim2
+
             Nt_yr   =  yr_end - yr_str + 1
+
+            CASE_dim1  =  1 ;  CASE_dim2  = 1
+            ind_str1   =  ( CASE_dim1-1 ) * dN_dim1 + 1 
+            ind_str2   =  ( CASE_dim2-1 ) * dN_dim2 + 1 
+            ind_str3   = 365*(yr_str-1982) + 1
 
             WRITE(char_str,"(I4.4)")  yr_str  ;  WRITE(char_end,"(I4.4)") yr_end
 
-            N1 = 1440 ; N2 = 720 ; N3 = Nt_yr * 365
+            N1 = dN_dim1 ; N2 = dN_dim2 ; N3 = Nt_yr * 365
             missing    =  -9.96921e+36
 
             dir_name   =  "DATA/OISST_v2"
@@ -37,22 +49,22 @@
             WRITE(*,*)  " "
             
             !<Read the time dimension
-            N  =  N3   ;  ind_str  = 365*(yr_str-1982) + 1 
+            N  =  N3
             var_name   =  "time"
             ALLOCATE(  time(1:N) ) 
-            CALL netCDF_read_1d(time, ind_str) 
+            CALL netCDF_read_1d(time, ind_str3) 
 
             !<Read the latitude dimension
-            N  =  N2 
+            N  =  N2
             var_name   =  "lat"
             ALLOCATE(  lat(1:N) ) 
-            CALL netCDF_read_1d(lat, 1) 
+            CALL netCDF_read_1d(lat, ind_str2) 
 
             !<Read the longitude dimension
-            N  =  N1 
+            N  =  N1
             var_name   =  "lon"
             ALLOCATE(  lon(1:N) ) 
-            CALL netCDF_read_1d(lon, 1) 
+            CALL netCDF_read_1d(lon, ind_str1) 
 
             !-----------------------------------------------------------------!
             !                         Read the SST data                       !
@@ -61,7 +73,7 @@
 
             ALLOCATE( sst_data(1:N1, 1:N2, 1:N3) ) 
             !<Read the SST data
-            CALL netCDF_read_3d(sst_data, ind_str)
+            CALL netCDF_read_3d(sst_data, ind_str1, ind_str2, ind_str3)
             
             WRITE(*,*)  "----------READING PROCESS COMPLETED----------"
             WRITE(*,*)  " "
@@ -73,7 +85,7 @@
 
             percent_1  =  90.0
             CALL MHW_clim_percent(N1,N2,sst_percentile_1,percent_1)
-            
+
             percent_2  =  75.0
             CALL MHW_clim_percent(N1,N2,sst_percentile_2,percent_2)
 
@@ -89,6 +101,8 @@
             !-----------------------------------------------------------------!
             WRITE(char_per1,"(I2.2)") INT(percent_1)
             WRITE(char_per2,"(I2.2)") INT(percent_2)
+            WRITE(char_dim1,"(I2.2)") CASE_dim1
+            WRITE(char_dim2,"(I2.2)") CASE_dim2
             
             !<Basic settings for the each variables & directory 
             dir_name   =  "RESULT"
@@ -100,16 +114,20 @@
 
             !<Write the intensity contour of MHWs
             file_name  =  "OISST_v2_win_11_daily_intensity."//                   &
+                          "CASE_"//TRIM(char_dim1)//"-"//TRIM(char_dim2)//"."// &
                           TRIM(char_str)//"-"//TRIM(char_end)//".nc"
             var_name   =  "sst_anom"
-            N1 = 1440 ; N2 = 720 ; N3 = Nt_yr * 365
+            N3 = Nt_yr * 365
+
             CALL netCDF_write_3d(sst_anom,lon,lat,time)
             
             !<Write the duration contour of MHWs
             file_name  =  "OISST_v2_win_11_daily_duration."//                   &
+                          "CASE_"//TRIM(char_dim1)//"-"//TRIM(char_dim2)//"."// &
                           TRIM(char_str)//"-"//TRIM(char_end)//".nc"
             var_name   =  "MHWs_dur"
-            N1 = 1440 ; N2 = 720 ; N3 = Nt_yr * 365
+            N3 = Nt_yr * 365
+
             CALL netCDF_write_3d(MHWs_dur,lon,lat,time)
             
             DEALLOCATE(time)  ;  ALLOCATE(time(1:365))
@@ -118,17 +136,20 @@
 
             !<Write the climatological mean 
             file_name  =  "OISST_v2_win_11_daily_clim_mean."//                   &
+                          "CASE_"//TRIM(char_dim1)//"-"//TRIM(char_dim2)//"."// &
                           TRIM(char_str)//"-"//TRIM(char_end)//".nc"
             var_name   =  "sst_clim"
             CALL netCDF_write_3d(sst_clim,lon,lat,time)
 
             !<Write the specific percentile data
             file_name  =  "OISST_v2_win_11_daily_percent."//TRIM(char_per1)//"_"&
+                          //"CASE_"//TRIM(char_dim1)//"-"//TRIM(char_dim2)//"." &
                           //TRIM(char_str)//"-"//TRIM(char_end)//".nc"
             var_name   =  "sst_percentile"
             CALL netCDF_write_3d(sst_percentile_1,lon,lat,time)
 
             file_name  =  "OISST_v2_win_11_daily_percent."//TRIM(char_per2)//"_"&
+                          //"CASE_"//TRIM(char_dim1)//"-"//TRIM(char_dim2)//"." &
                           //TRIM(char_str)//"-"//TRIM(char_end)//".nc"
             var_name   =  "sst_percentile"
             CALL netCDF_write_3d(sst_percentile_2,lon,lat,time)
