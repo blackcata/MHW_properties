@@ -26,7 +26,7 @@
             REAL(KIND=8),ALLOCATABLE,DIMENSION(:,:,:)  ::  sst_clim
             REAL(KIND=8),ALLOCATABLE,DIMENSION(:,:,:)  ::  sst_percentile_1
             REAL(KIND=8),ALLOCATABLE,DIMENSION(:,:,:)  ::  sst_percentile_2
-            REAL(KIND=8),ALLOCATABLE,DIMENSION(:,:,:)  ::  sst_anom
+            REAL(KIND=8),ALLOCATABLE,DIMENSION(:,:,:)  ::  sst_anom, MHW_peak
 
             SAVE
 
@@ -61,7 +61,7 @@
               ALLOCATE( sst_percentile_1(1:Nx,1:Ny,1:365) )
               ALLOCATE( sst_percentile_2(1:Nx,1:Ny,1:365) )
               ALLOCATE( sst_anom(1:Nx,1:Ny,1:Nt) ) 
-              ALLOCATE( MHWs_dur(1:Nx,1:Ny,1:Nt) ) 
+              ALLOCATE( MHWs_dur(1:Nx,1:Ny,1:Nt), MHW_peak(1:Nx,1:Ny,1:Nt ) )
               
           END SUBROUTINE MHW_setup
 
@@ -326,5 +326,21 @@
               END DO 
 
           END SUBROUTINE MHW_duration
+
+!------------------------------------------------------------------------------!
+!                                                                              !
+!   SUBROUTINE : MHW_find_peak                                                 !
+!                                                                              !
+!   PURPOSE : Calculate the MHWs' peak point                                   !
+!                                                                              !
+!                                                             2019.05.13.K.Noh !
+!                                                                              !
+!------------------------------------------------------------------------------!
+          SUBROUTINE MHW_find_peak(Nx,Ny)
+
+              IMPLICIT NONE            
+              INTEGER,INTENT(IN)  ::  Nx, Ny
+
+          END SUBROUTINE MHW_find_peak
 
         END MODULE mod_MHWs
