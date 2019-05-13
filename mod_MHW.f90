@@ -19,14 +19,14 @@
             INTEGER  :: window, Nt_yr, N_percent, thres, window_sm
             REAL(KIND=8)  :: percent_1, percent_2
 
-            REAL(KIND=8),ALLOCATABLE,DIMENSION(:,:,:)  ::  MHWs_dur
+            REAL(KIND=8),ALLOCATABLE,DIMENSION(:,:,:)  ::  MHWs_dur, MHWs_peak
 
             REAL(KIND=8),ALLOCATABLE,DIMENSION(:)      ::  lat, lon, time  
             REAL(KIND=8),ALLOCATABLE,DIMENSION(:,:,:)  ::  sst_data
             REAL(KIND=8),ALLOCATABLE,DIMENSION(:,:,:)  ::  sst_clim
             REAL(KIND=8),ALLOCATABLE,DIMENSION(:,:,:)  ::  sst_percentile_1
             REAL(KIND=8),ALLOCATABLE,DIMENSION(:,:,:)  ::  sst_percentile_2
-            REAL(KIND=8),ALLOCATABLE,DIMENSION(:,:,:)  ::  sst_anom, MHW_peak
+            REAL(KIND=8),ALLOCATABLE,DIMENSION(:,:,:)  ::  sst_anom
 
             SAVE
 
@@ -61,7 +61,7 @@
               ALLOCATE( sst_percentile_1(1:Nx,1:Ny,1:365) )
               ALLOCATE( sst_percentile_2(1:Nx,1:Ny,1:365) )
               ALLOCATE( sst_anom(1:Nx,1:Ny,1:Nt) ) 
-              ALLOCATE( MHWs_dur(1:Nx,1:Ny,1:Nt), MHW_peak(1:Nx,1:Ny,1:Nt ) )
+              ALLOCATE( MHWs_dur(1:Nx,1:Ny,1:Nt), MHWs_peak(1:Nx,1:Ny,1:Nt ) )
               
           END SUBROUTINE MHW_setup
 
@@ -340,6 +340,59 @@
 
               IMPLICIT NONE            
               INTEGER,INTENT(IN)  ::  Nx, Ny
+              INTEGER      ::  i, j, yr, it, tmp 
+              INTEGER      ::  ind_str, ind_end, location_max
+              LOGICAL      ::  start_fix, end_fix
+
+              REAL(KIND=8),DIMENSION(:),ALLOCATABLE  ::  MHWs_loc
+
+              MHWs_peak  =  0.0
+
+              DO j = 1,Ny
+                DO i = 1,Nx
+
+                    IF ( abs( MHWs_dur(i,j,1) - missing ) < 1.0e+1 ) THEN 
+                        MHWs_peak(i,j,:)  =  missing
+                        CYCLE
+                    END IF
+
+                    ind_str = 0  ;  ind_end = 0 
+                    start_fix  =  .TRUE.
+                    end_fix    =  .FALSE. 
+
+                    DO yr = 1,Nt_yr
+                      DO it = 1,365
+
+                          tmp  =  (yr-1) * 365 
+
+                          IF( start_fix .AND. MHWs_dur(i,j,tmp+it) > 0 ) THEN
+                              ind_str    =  tmp + it 
+                              start_fix  = .FALSE.
+                              end_fix    = .TRUE.
+                          END IF
+
+                          IF( end_fix   .AND. MHWs_dur(i,j,tmp+it) <= 0 ) THEN
+                              ind_end    =  tmp + it - 1 
+                              start_fix  = .TRUE.
+                              end_fix    = .FALSE.
+
+                              ALLOCATE( MHWs_loc(1:ind_end-ind_str+1) ) 
+
+                              MHWs_loc      =  MHWs_dur(i,j,ind_str:ind_end) 
+                              location_max  =  MAXLOC(MHWs_loc,1) 
+                              print*,i,j,ind_str,ind_end,location_max
+
+                              MHWs_peak(i,j,ind_str+location_max-1)  =          &
+                                            MHWs_dur(i,j,ind_str+location_max-1)
+                              
+                              DEALLOCATE( MHWs_loc ) 
+                          END IF 
+
+                      END DO
+                    END DO 
+
+                END DO 
+              END DO 
 
           END SUBROUTINE MHW_find_peak
 
