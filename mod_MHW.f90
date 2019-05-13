@@ -349,6 +349,7 @@
               MHWs_peak  =  0.0
 
               DO j = 1,Ny
+                !$OMP PARALLEL DO private(i,yr,it,ind_str,ind_end,start_fix,end_fix,tmp,MHWs_loc,location_max)
                 DO i = 1,Nx
 
                     IF ( abs( MHWs_dur(i,j,1) - missing ) < 1.0e+1 ) THEN 
@@ -391,6 +392,7 @@
                     END DO 
 
                 END DO 
+                !OMP END PARALLEL
               END DO 
 
           END SUBROUTINE MHW_find_peak
