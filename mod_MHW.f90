@@ -380,7 +380,6 @@
 
                               MHWs_loc      =  MHWs_dur(i,j,ind_str:ind_end) 
                               location_max  =  MAXLOC(MHWs_loc,1) 
-                              print*,i,j,ind_str,ind_end,location_max
 
                               MHWs_peak(i,j,ind_str+location_max-1)  =          &
                                             MHWs_dur(i,j,ind_str+location_max-1)
