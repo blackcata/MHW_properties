@@ -50,8 +50,9 @@
               !   result_type  :  1 - All date              !
               !                   2 - Start day             !
               !                   3 - End day               !
+              !                   4 - Cumulative Intensity  ! 
               !---------------------------------------------!
-              result_type  =  1 
+              result_type  =  1
           
               window       =  5
               thres        =  5
@@ -235,6 +236,7 @@
               INTEGER,INTENT(IN)  ::  Nx, Ny
               INTEGER  :: i, j, it,  yr, tmp, ind_str, ind_end, day_ind
               REAL(KIND=8) :: diff_str, diff_str_pre, diff_end, diff_end_pre
+              REAL(KIND=8) :: cum_sst_anom
               LOGICAL      :: start_fix, end_fix
 
               DO j = 1,Ny
@@ -313,6 +315,11 @@
                                   ELSEIF ( result_type == 3 ) THEN 
                                     !<The MHWs ending day and duration
                                     MHWs_dur(i,j,ind_end) = (ind_end-ind_str+1)
+                                  ELSEIF ( result_type == 4 ) THEN 
+                                    !<The MHWs ending day and duration
+                                    cum_sst_anom  =                             &
+                                            SUM(sst_anom(i,j,ind_str:ind_end-1))
+                                    MHWs_dur(i,j,ind_str) = cum_sst_anom
                                   END IF
 
                               END IF
