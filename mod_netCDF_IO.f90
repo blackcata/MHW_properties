@@ -109,6 +109,52 @@
 
 !------------------------------------------------------------------------------!
 !                                                                              !
+!   SUBROUTINE : netCDF_write_1d                                               !
+!                                                                              !
+!   PURPOSE : Writing the 1D netCDF files                                      !
+!                                                                              !
+!                                                             2019.05.13.K.Noh !
+!                                                                              !
+!------------------------------------------------------------------------------!
+          SUBROUTINE netCDF_write_1d(data_output,data_dim3)
+
+              IMPLICIT NONE            
+             
+              REAL(KIND=8),INTENT(IN)  ::  data_dim3(1:N3)
+              REAL(KIND=8),INTENT(IN)  ::  data_output(1:N3)
+
+              path_name  = "./"//TRIM(dir_name)//"/"//TRIM(file_name)
+              
+              !<Open the output file
+              CALL CHECK( NF90_CREATE(path_name, NF90_SHARE, ncid)  )
+              
+              !<Define dimensions
+              CALL CHECK( NF90_DEF_DIM(ncid, TRIM(dim3_name),  N3, dim3) )
+
+              !<Define the coordinate variables & output variable
+              CALL CHECK( NF90_DEF_VAR(ncid,TRIM(dim3_name),NF90_DOUBLE,dim3,id3))
+              CALL CHECK( NF90_DEF_VAR(ncid, var_name, NF90_DOUBLE,             &
+                                                      (/dim3/), varid) )
+              !<Assign missing values
+              CALL CHECK( NF90_PUT_ATT(ncid,varid,'_FillValue', missing) )
+
+              !<Add dimension's units
+              CALL CHECK( NF90_PUT_ATT(ncid,id3,"units",TRIM(dim3_unit)) )
+
+              !<End define mode
+              CALL CHECK( NF90_ENDDEF(ncid) )
+
+              !<Write the coordinate variable & output variable
+              CALL CHECK( NF90_PUT_VAR(ncid, id3,   data_dim3) )
+              CALL CHECK( NF90_PUT_VAR(ncid, varid, data_output) )
+
+              !<Close the file
+              CALL CHECK( NF90_CLOSE(ncid) )
+
+          END SUBROUTINE netCDF_write_1d
+
+!------------------------------------------------------------------------------!
+!                                                                              !
 !   SUBROUTINE : netCDF_write_3d                                               !
 !                                                                              !
 !   PURPOSE : Writing the 3D netCDF files                                      !

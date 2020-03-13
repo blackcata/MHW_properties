@@ -91,6 +91,7 @@
 
             CALL MHW_intensity(N1,N2)
             CALL MHW_duration(N1,N2)
+            CALL MHW_find_peak(N1,N2)
 
             WRITE(*,*)  "--------CALCULATING PROCESS COMPLETED--------"
             WRITE(*,*)  " "
@@ -130,6 +131,15 @@
 
             CALL netCDF_write_3d(MHWs_dur,lon,lat,time)
             
+            !<Write the peak contour of MHWs
+            file_name  =  "OISST_v2_win_11_daily_peak."//                   &
+                          "CASE_"//TRIM(char_dim1)//"-"//TRIM(char_dim2)//"."// &
+                          TRIM(char_str)//"-"//TRIM(char_end)//".nc"
+            var_name   =  "MHWs_peak"
+            N3 = Nt_yr * 365
+
+            CALL netCDF_write_3d(MHWs_peak,lon,lat,time)
+
             DEALLOCATE(time)  ;  ALLOCATE(time(1:365))
             DO it = 1,365 ; time(it) = it ; END DO 
             N3 = 365
