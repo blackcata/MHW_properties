@@ -29,7 +29,7 @@
             WRITE(*,*)  "--------SETUP PROCESS STARTED--------"
 
                 !<Option for climatology (365) or all time series (Nt_year * 365)
-                climatology  =  .TRUE.
+                climatology  =  .FALSE.
 
                 !<Start / End SST years
                 yr_str   =  1982
@@ -49,8 +49,8 @@
                 END IF
 
                 !<Prefix / output variable of combining files
-                char_prefix  =  "OISST_v2_win_11_daily_clim_mean."
-                output_var   =  "sst_clim"
+                char_prefix  =  "OISST_v2_win_11_daily_duration."
+                output_var   =  "MHWs_dur"
 
                 !<Path of input / output files 
                 input_path    =  "DATA/1982_2019_Criteria_9090"
@@ -65,7 +65,7 @@
             file_name  =  "sst_daily_mean.1982-2019.v2.nc"
             
             !<Read the time dimension
-            N  =  365
+            N  =  N3
             var_name   =  "time"
             ALLOCATE(  time(1:N) )
 
