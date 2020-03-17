@@ -28,25 +28,31 @@
             WRITE(*,*) " "
             WRITE(*,*)  "--------SETUP PROCESS STARTED--------"
 
+                !<Option for climatology (365) or all time series (Nt_year * 365)
                 climatology  =  .TRUE.
 
+                !<Start / End SST years
                 yr_str   =  1982
                 yr_end   =  2019
                 Nt_yr    =  yr_end  -  yr_str  +  1
 
+                !<Longitude / Latitude slice and the number of grid resolution
                 N_dim1   =  4              ;  N_dim2   =  2
                 dN_dim1  =  1440 / N_dim1  ;  dN_dim2  =  720 / N_dim2
                 N_dim    =  N_dim1 * N_dim2
 
+                !<Dimension of each dimension (longitude,latitude,time)
                 IF  ( climatology ) THEN
                     N1 = dN_dim1 ; N2 = dN_dim2 ; N3 = 365
                 ELSE
                     N1 = dN_dim1 ; N2 = dN_dim2 ; N3 = Nt_yr * 365
                 END IF
 
+                !<Prefix / output variable of combining files
                 char_prefix  =  "OISST_v2_win_11_daily_clim_mean."
                 output_var   =  "sst_clim"
 
+                !<Path of input / output files 
                 input_path    =  "DATA/1982_2019_Criteria_9090"
                 output_path   =  "RESULT"
 
