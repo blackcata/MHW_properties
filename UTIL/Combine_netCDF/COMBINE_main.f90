@@ -78,13 +78,13 @@
             END IF
 
             !<Read the latitude dimension
-            N  =  N2 
+            N  =  N2 * N_dim2
             var_name   =  "lat"
             ALLOCATE(  lat(1:N) )
             CALL netCDF_read_1d(lat, 1)
 
             !<Read the longitude dimension
-            N  =  N1 
+            N  =  N1 * N_dim1
             var_name   =  "lon"
             ALLOCATE(  lon(1:N) )
             CALL netCDF_read_1d(lon, 1)
