@@ -24,8 +24,8 @@
             !-----------------------------------------------------------------!
             !                     Read the file's dimension                   !
             !-----------------------------------------------------------------!
-            yr_str  =  1982!year_MHW
-            yr_end  =  2017!year_MHW
+            yr_str  =  1982
+            yr_end  =  2019
 
             N_dim1   =  4              ;  N_dim2   =  2
             dN_dim1  =  1440 / N_dim1  ;  dN_dim2  =  720 / N_dim2
@@ -43,8 +43,8 @@
             N1 = dN_dim1 ; N2 = dN_dim2 ; N3 = Nt_yr * 365
             missing    =  -9.96921e+36
 
-            dir_name   =  "DATA/OISST_v2"
-            file_name  =  "sst_daily_mean.1982-2018.v2.nc"
+            dir_name   =  "DATA/OISST_v2/remove_leap"
+            file_name  =  "sst_daily_mean.1982-2019.v2.nc"
             WRITE(*,*)  "------------BASIC SETUP COMPLETED------------"
             WRITE(*,*)  " "
             
@@ -83,44 +83,15 @@
             !-----------------------------------------------------------------!
             CALL MHW_setup(N1,N2,N3)
 
+            percent_1  =  90.0
+            CALL MHW_clim_percent(N1,N2,sst_percentile_1,percent_1)
 
-      !-----------------------------------------------------------------!
-      N3 = 365
-      missing    =  -9.96921e+36
+            percent_2  =  90.0
+            CALL MHW_clim_percent(N1,N2,sst_percentile_2,percent_2)
 
-      dir_name   =  "DATA"
-      file_name  =  "OISST_v2_win_11_daily_clim_mean.1982-2013.nc"
-      var_name   =  "sst_clim"
-      CALL netCDF_read_3d(sst_clim,ind_str1,ind_str2,1)
-      !-----------------------------------------------------------------!
-
-      !-----------------------------------------------------------------!
-      N3 = 365
-      missing    =  -9.96921e+36
-
-      dir_name   =  "DATA"
-!      file_name  =  "OISST_v2_win_11_daily_90_percent.1982-2018.nc"
-      file_name  =  "OISST_v2_win_11_daily_percent.90_1982-2013.nc"
-      var_name   =  "sst_percentile"
-      CALL netCDF_read_3d(sst_percentile_1,ind_str1,ind_str2,1)
-      !-----------------------------------------------------------------!
-
-      sst_percentile_2  =  sst_percentile_1
-
-!      !-----------------------------------------------------------------!
-!      N3 = 365
-!      missing    =  -9.96921e+36
-!
-!      dir_name   =  "DATA"
-!!      file_name  =  "OISST_v2_win_11_daily_75_percent.1982-2018.nc"
-!      file_name  =  "OISST_v2_win_11_daily_percent.75_1982-2013.nc"
-!!      file_name  =  "OISST_v2_win_11_daily_percent.90_1982-2013.nc"
-!      var_name   =  "sst_percentile"
-!      CALL netCDF_read_3d(sst_percentile_2,ind_str1,ind_str2,1)
-!      !-----------------------------------------------------------------!
-      
             CALL MHW_intensity(N1,N2)
             CALL MHW_duration(N1,N2)
+            CALL MHW_find_peak(N1,N2)
 
             WRITE(*,*)  "--------CALCULATING PROCESS COMPLETED--------"
             WRITE(*,*)  " "
@@ -135,21 +106,21 @@
             WRITE(char_dim2,"(I2.2)") CASE_dim2
             
             !<Basic settings for the each variables & directory 
-            dir_name   =  "RESULT"
+            dir_name   =  "RESULT/1982_2019"
             dim1_name  =  "lon" ; dim2_name = "lat" ; dim3_name = "time"
 
             dim1_unit  =  "degrees_east" 
             dim2_unit  =  "degrees_north"
             dim3_unit  =  "days since 1800-01-01 00:00:00"
 
-!            !<Write the intensity contour of MHWs
-!            file_name  =  "OISST_v2_win_11_daily_intensity."//                   &
-!                          "CASE_"//TRIM(char_dim1)//"-"//TRIM(char_dim2)//"."// &
-!                          TRIM(char_str)//"-"//TRIM(char_end)//".nc"
-!            var_name   =  "sst_anom"
-!            N3 = Nt_yr * 365
-!
-!            CALL netCDF_write_3d(sst_anom,lon,lat,time)
+            !<Write the intensity contour of MHWs
+            file_name  =  "OISST_v2_win_11_daily_intensity."//                   &
+                          "CASE_"//TRIM(char_dim1)//"-"//TRIM(char_dim2)//"."// &
+                          TRIM(char_str)//"-"//TRIM(char_end)//".nc"
+            var_name   =  "sst_anom"
+            N3 = Nt_yr * 365
+
+            CALL netCDF_write_3d(sst_anom,lon,lat,time)
             
             !<Write the duration contour of MHWs
             file_name  =  "OISST_v2_win_11_daily_duration."//                   &
@@ -159,27 +130,39 @@
             N3 = Nt_yr * 365
 
             CALL netCDF_write_3d(MHWs_dur,lon,lat,time)
-!            
-!            DEALLOCATE(time)  ;  ALLOCATE(time(1:365))
-!            DO it = 1,365 ; time(it) = it ; END DO 
-!            N3 = 365
-!
-!            !<Write the climatological mean 
-!            file_name  =  "OISST_v2_win_11_daily_clim_mean."//                   &
-!                          TRIM(char_str)//"-"//TRIM(char_end)//".nc"
-!            var_name   =  "sst_clim"
-!            CALL netCDF_write_3d(sst_clim,lon,lat,time)
-!
-!            !<Write the specific percentile data
-!            file_name  =  "OISST_v2_win_11_daily_percent."//TRIM(char_per1)//"_"&
-!                          //TRIM(char_str)//"-"//TRIM(char_end)//".nc"
-!            var_name   =  "sst_percentile"
-!            CALL netCDF_write_3d(sst_percentile_1,lon,lat,time)
-!
-!            file_name  =  "OISST_v2_win_11_daily_percent."//TRIM(char_per2)//"_"&
-!                          //TRIM(char_str)//"-"//TRIM(char_end)//".nc"
-!            var_name   =  "sst_percentile"
-!            CALL netCDF_write_3d(sst_percentile_2,lon,lat,time)
+            
+            !<Write the peak contour of MHWs
+            file_name  =  "OISST_v2_win_11_daily_peak."//                   &
+                          "CASE_"//TRIM(char_dim1)//"-"//TRIM(char_dim2)//"."// &
+                          TRIM(char_str)//"-"//TRIM(char_end)//".nc"
+            var_name   =  "MHWs_peak"
+            N3 = Nt_yr * 365
+
+            CALL netCDF_write_3d(MHWs_peak,lon,lat,time)
+
+            DEALLOCATE(time)  ;  ALLOCATE(time(1:365))
+            DO it = 1,365 ; time(it) = it ; END DO 
+            N3 = 365
+
+            !<Write the climatological mean 
+            file_name  =  "OISST_v2_win_11_daily_clim_mean."//                   &
+                          "CASE_"//TRIM(char_dim1)//"-"//TRIM(char_dim2)//"."// &
+                          TRIM(char_str)//"-"//TRIM(char_end)//".nc"
+            var_name   =  "sst_clim"
+            CALL netCDF_write_3d(sst_clim,lon,lat,time)
+
+            !<Write the specific percentile data
+            file_name  =  "OISST_v2_win_11_daily_percent."//TRIM(char_per1)//"_"&
+                          //"CASE_"//TRIM(char_dim1)//"-"//TRIM(char_dim2)//"." &
+                          //TRIM(char_str)//"-"//TRIM(char_end)//".nc"
+            var_name   =  "sst_percentile"
+            CALL netCDF_write_3d(sst_percentile_1,lon,lat,time)
+
+            file_name  =  "OISST_v2_win_11_daily_percent."//TRIM(char_per2)//"_"&
+                          //"CASE_"//TRIM(char_dim1)//"-"//TRIM(char_dim2)//"." &
+                          //TRIM(char_str)//"-"//TRIM(char_end)//".nc"
+            var_name   =  "sst_percentile"
+            CALL netCDF_write_3d(sst_percentile_2,lon,lat,time)
 
             WRITE(*,*)  "--------WRITING PROCESS COMPLETED--------"
 
