@@ -3,6 +3,8 @@ This fortran code is purposed to calculate MHWs(Marine Heat Waves) properties fr
 This code detects individual MHWs in each grid that MHW properties, such as duration, intensity, frequency, are calculated.
 This code is parallelized with openMP, which can be utilized with multi-core programming and is tested with 32 CPUs.
 
+Marine heatwaes are firstly referred by Pearce et al 2011 and quantitively defined as prolonged, discrete anomalous warm water event (Hobday et al 2016). After the specific definition by Hobday, the related studies have attracted the attention of many researchers. Especially, the Oliver et al 2018 suggested that these extreme events have been intensified, extended and more frequently generated in recent 30 yeas. Not only for recent periods, climate models have projected the wider, stronger, longer MHWs either (Frolicher et al 2018). 
+
 Marine Heatwaves are detected and analyzed by the MHW_properties code and published to the Environmental Research Letters.
 
 ### Title : Global chlorophyll responses to marine heatwaves in satellite ocean color
