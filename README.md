@@ -1,4 +1,4 @@
-# Impacts of Marine Heatwaves to Phytoplankton
+# Global Phytoplankton Responses to Marine Heatwaves
 This fortran code is purposed to calculate MHWs(Marine Heat Waves) properties from daily SST data. 
 This code detects individual MHWs in each grid that MHW properties, such as duration, intensity, frequency, are calculated.
 This code is parallelized with openMP, which can be utilized with multi-core programming and is tested with 32 CPUs.
