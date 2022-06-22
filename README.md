@@ -5,6 +5,8 @@ This code is parallelized with openMP, which can be utilized with multi-core pro
 
 Marine heatwaes are firstly referred by Pearce et al 2011 and quantitively defined as prolonged, discrete anomalous warm water event (Hobday et al 2016). After the specific definition by Hobday, the related studies have attracted the attention of many researchers. Especially, the Oliver et al 2018 suggested that these extreme events have been intensified, extended and more frequently generated in recent 30 yeas. Not only for recent periods, climate models have projected the wider, stronger, longer MHWs either (Frolicher et al 2018). 
 
+Deleterious impacts of MHWs to marine ecosystems have been reported, for example coral bleaching (Hughes et al 2017), toxic algal blooms (McCabe et al 2016, Roberts et al 2019),high mortality rates for seagrasses (Garrabou et al 2009, Arias-Ortiz et al 2017), seabirds (Jones et al 2018) and fish (Roberts et al 2019, Cheung and Frölicher 2020), which are all regarded as threats to biodiversity (Wernberg et al 2012, Smale et al 2019). Additionally, the phytoplankton, which consists the base of the marine ecosystem, has been investigated (Guta Sen et al 2020, Hayashida et al 2020, Le-Grix 2021). However, the global impact and the sensitivity of MHWs properties are not known well that the global chlorophyll responses to MHWs are suggested by our team.
+
 Marine Heatwaves are detected and analyzed by the MHW_properties code and published to the Environmental Research Letters.
 
 ### Title : Global chlorophyll responses to marine heatwaves in satellite ocean color
